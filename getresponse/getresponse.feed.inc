@@ -1,13 +1,10 @@
 <?php
-
 /**
  * @file
  * Functions for RSS.
  */
-
 define('ELEMENT_CONTENT_ONLY', TRUE);
 define('ELEMENT_PRESERVE_TAGS', FALSE);
-
 class GetResponseRSS {
   public $urlFeed;
   public $limit = 10;
@@ -45,8 +42,7 @@ class GetResponseRSS {
     return FALSE;
   }
 
-  private function makeSafe($string)
-  {
+  private function makeSafe($string) {
     $string = preg_replace('#<!\[CDATA\[.*?\]\]>#s', '', $string);
     $string = strip_tags($string);
     $string = str_replace('<', '&lt;', $string);
@@ -55,11 +51,11 @@ class GetResponseRSS {
     $string = str_replace(')', '&#41;', $string);
     $string = str_replace('"', '&quot;', $string);
     $string = str_replace('\'', '&#039;', $string);
+
     return $string;
   }
 
-  function curlRss()
-  {
+  function curlRss() {
     if ( function_exists( 'curl_init' ) )
     {
       $ch = curl_init();
@@ -70,12 +66,12 @@ class GetResponseRSS {
       curl_close($ch);
       return TRUE;
     } else {
+
       return FALSE;
     }
   }
 
-  function renderRss()
-  {
+  function renderRss() {
     if ( $this->curlRss() ) {
       $news_items = $this->elementSet('item', $this->xml);
 
@@ -116,6 +112,7 @@ class GetResponseRSS {
     else {
       $html = "Can't connect to RSS.";
     }
+
     return $html;
   }
 }
