@@ -1,33 +1,35 @@
-===========================
+INTRODUCTION
+-----------
 Plugin Name: GetResponse Plugin
-Description: This plugin will add GetResponse WebForm to your site. 
+Description: This plug-in/module enables installation of a GetResponse fully customizable sign up form on your Drupal site.
 Version: 1.0.0
 Author: Sylwester Okrój
 License: GPL2
-===========================
 
-GetResponse Integration
 
+GETRESPONSE INTEGRATION
+-----------
 This plug-in/module enables installation of a GetResponse fully customizable sign up form on your Drupal site. Once a web form is created and added to the site the visitors are automatically added to your GetResponse contact list and send a confirmation email. The plug-in additionally offers sign-up upon leaving a comment. 
 
 
-Installation:
+INSTALLATION:
+-----------
 
-	Method 1.
-
+* Method 1.
 1. Download the GetResponse plug-in for your Drupal version.
 2. Unzip the downloaded file and extract the code to your /sites/all/modules/ folder.
 3. To complete installation you should enable the module in the administration section of your site.
 
-	Method 2.
-
+* Method 2.
 1. On your Drupal site navigate to admin/modules/install.
 2. Click choose file.
 3. Browse to the location to which the module has been downloaded to your desktop.
 4. Click install.
 5. You may then enable your module from this page or navigate to admin/modules.
 
-Configuration:
+
+CONFIGURATION:
+-----------
 
 1. Create the web form in your GetResponse account.
 2. Go to your Drupal plug-in settings.

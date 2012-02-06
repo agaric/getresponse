@@ -1,240 +1,230 @@
 <?php
-/*
-Plugin Name: GetResponse Plugin
-Description: This plugin will add GetResponse WebForm to your site. 
-Version: 1.0.0
-Author: Sylwester Okrój
-License: GPL2
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License, version 2, as 
-    published by the Free Software Foundation.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+/**
+ * @file
+ * GetResponse module.
+ */
 
 /**
-* URL
+* URLs, functions, includes
 **/
-define('GETRESPONSE_URL', 'http://getresponse.com/view_webform.js');
-define('GETRESPONSE_URL_CURL', 'http://app.getresponse.com/add_contact_webform.html');		
-define('GETRESPONSE_URL_FEED', 'http://blog.getresponse.com/feed');
-
-include('getresponse.feed.inc');
-
-function is_login() 
-{
-	$output=$GLOBALS['user']->uid==0 ? 0:1;
-	return $output;
+if (!defined('GETRESPONSE_URL')) {
+	define('GETRESPONSE_URL', 'http://getresponse.com/view_webform.js');
+}
+if (!defined('GETRESPONSE_URL_CURL')) {
+	define('GETRESPONSE_URL_CURL', 'http://app.getresponse.com/add_contact_webform.html');
+}
+if (!defined('GETRESPONSE_URL_FEED')) {
+	define('GETRESPONSE_URL_FEED', 'http://blog.getresponse.com/feed');
 }
 
-// curl
-function getresponse_curl_contact( $name, $email, $webform_id, $method='GET')
+function is_login()
 {
-		if ( function_exists( 'curl_init' ) )
-		{
-			$str_url = 'type=ajax';
-			$str_url .= '&name=' . urlencode($name);
-			$str_url .= '&email=' . urlencode($email);
-			$str_url .= '&webform_id=' . $webform_id;
-			$str_url .= '&submit=Sign%20Up!';
-			$ch = curl_init();
-			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($ch, CURLOPT_AUTOREFERER, 1);
-			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 60);
-			curl_setopt($ch, CURLOPT_TIMEOUT, 60);
-			curl_setopt($ch, CURLOPT_HEADER, 0 );
-			if ($method == 'POST')
-			{
-				curl_setopt($ch, CURLOPT_POST, 1);
-				curl_setopt($ch, CURLOPT_POSTFIELDS, $str_url);
-				curl_setopt($ch, CURLOPT_URL, GETRESPONSE_URL_CURL);
-			}
-			else {
-				curl_setopt($ch, CURLOPT_POST, 0);
-				curl_setopt($ch, CURLOPT_URL, GETRESPONSE_URL_CURL . '?' . $str_url );
-			}
-			$output = curl_exec($ch);
-			curl_close($ch);
-			return true;
-		}
-		else {
-			return false;
-		}
+    $output=$GLOBALS['user']->uid==0 ? 0:1;
+    return $output;
 }
 
 /** 
-* Implement hook_help(). 
-*/ 
-function getresponse_help($path, $arg) 
-{ 
-    switch ($path) { 
-        case 'admin/help#getresponse': 
-        return '<p>Help page.</p>'; 
+ * CURL
+ */
+function getresponse_curl_contact( $name, $email, $webform_id, $method='GET')
+{
+    if ( function_exists( 'curl_init' ) )
+    {
+        $str_url = 'type=ajax';
+        $str_url .= '&name=' . urlencode($name);
+        $str_url .= '&email=' . urlencode($email);
+        $str_url .= '&webform_id=' . $webform_id;
+        $str_url .= '&submit=Sign%20Up!';
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_AUTOREFERER, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 60);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+        curl_setopt($ch, CURLOPT_HEADER, 0 );
+        if ($method == 'POST')
+        {
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $str_url);
+            curl_setopt($ch, CURLOPT_URL, GETRESPONSE_URL_CURL);
+        }
+        else {
+            curl_setopt($ch, CURLOPT_POST, 0);
+            curl_setopt($ch, CURLOPT_URL, GETRESPONSE_URL_CURL . '?' . $str_url );
+        }
+        $output = curl_exec($ch);
+        curl_close($ch);
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+/**
+ * Implement hook_help().
+ */
+function getresponse_help($path, $arg)
+{
+    switch ($path) {
+        case 'admin/help#getresponse':
+            return '<p>Help page.</p>';
     }
 }
 
 /**
  * Implements hook_menu().
  */
-function getresponse_menu() 
+function getresponse_menu()
 {
-    $items = array();  
+    $items = array();
 
     $items['admin/config/services/getresponse'] = array(
-        'title' => 'GetResponse',
-        'description' => 'Configuration for GetResponse module',
-        'page callback' => 'drupal_get_form',
-        'page arguments' => array('getresponse_admin'),
-        'access arguments' => array('administer getresponse'),
-        'type' => MENU_NORMAL_ITEM, 
-        'file' => 'getresponse.feed.inc',
+            'title' => 'GetResponse',
+            'description' => 'Configuration for GetResponse module',
+            'page callback' => 'drupal_get_form',
+            'page arguments' => array('getresponse_admin'),
+            'access arguments' => array('administer getresponse'),
+            'type' => MENU_NORMAL_ITEM,
+            'file' => 'getresponse.feed.inc',
     );
-  
+
     $items['admin/config/services/getresponse/global'] = array(
-        'title' => 'Global Settings',
-        'type' => MENU_DEFAULT_LOCAL_TASK,
-        'weight' => -10,
-  );
-  
-  return $items;
-}  
+            'title' => 'Global Settings',
+            'type' => MENU_DEFAULT_LOCAL_TASK,
+            'weight' => -10,
+    );
+
+    return $items;
+}
 
 
 /**
  * Implements hook_admin().
  */
-function getresponse_admin() 
+function getresponse_admin()
 {
     $form = array();
     $form['left'] = array(
-    	'#type' => 'item',
-    	);
+            '#type' => 'item',
+    );
     $form['right'] = array(
-    	'#type' => 'item',
-    	);
-    
-	$form['left']['f1'] = array(
-        '#type' => 'fieldset', 
-        '#title' => t('GetResponse Config'), 
-        '#weight' => 1, 
-        '#collapsible' => FALSE, 
-        '#collapsed' => FALSE,
-        );
-        
+            '#type' => 'item',
+    );
+
+    $form['left']['f1'] = array(
+            '#type' => 'fieldset',
+            '#title' => t('GetResponse Config'),
+            '#weight' => 1,
+            '#collapsible' => FALSE,
+            '#collapsed' => FALSE,
+    );
+
     $form['left']['f1']['title1'] = array(
-      '#type' => 'item',
-      '#markup' => t('<h3>Subscribe via Web Form</h3>'),
-    );  
+            '#type' => 'item',
+            '#markup' => t('<h3>Subscribe via Web Form</h3>'),
+    );
 
     $form['left']['f1'] ['getresponse_webformid'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Web form ID:'),
-        '#default_value' => variable_get('getresponse_webformid', ''),
-        '#size' => 0,
-        '#maxlength' => 7,
-        '#description' => t("(leave empty to disable)")
+            '#type' => 'textfield',
+            '#title' => t('Web form ID:'),
+            '#default_value' => variable_get('getresponse_webformid', ''),
+            '#size' => 0,
+            '#maxlength' => 7,
+            '#description' => t("(leave empty to disable)")
     );
-    
+
     $form['left']['f1']['getresponse_styleid'] = array(
-        '#type' => 'select',
-        '#title' => t('Style:'),
-        '#default_value' => variable_get('getresponse_styleid', 1),
-        '#options' => array(
-            '0' => t('Drupal'),
-            '1' => t('Web Form'),
-         ),
+            '#type' => 'select',
+            '#title' => t('Style:'),
+            '#default_value' => variable_get('getresponse_styleid', 1),
+            '#options' => array(
+                    '0' => t('Drupal'),
+                    '1' => t('Web Form'),
+            ),
     );
-    
+
     $form['left']['f1']['title2'] = array(
-      '#type' => 'item',
-      '#markup' => t('<br /><h3>Subscribe via Comment</h3>'),
-    ); 
-
-	$form['left']['f1']['getresponse_comment_on'] = array(
-        '#type' => 'select',
-        '#title' => t('Comment integration:'),
-        '#default_value' => variable_get('getresponse_comment_on', 1),
-        '#options' => array(
-            '1' => t('On'),
-            '0' => t('Off'),
-         ),
-        '#description' => t("(allow subscriptions when visitors comment)")
+            '#type' => 'item',
+            '#markup' => t('<br /><h3>Subscribe via Comment</h3>'),
     );
 
-	$form['left']['f1']['getresponse_comment_label'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Additional text:'),
-        '#default_value' => variable_get('getresponse_comment_label', 'Sign up to our newsletter!'),
-        '#size' => 0,
-        '#minlength' => 7,
+    $form['left']['f1']['getresponse_comment_on'] = array(
+            '#type' => 'select',
+            '#title' => t('Comment integration:'),
+            '#default_value' => variable_get('getresponse_comment_on', 1),
+            '#options' => array(
+                    '1' => t('On'),
+                    '0' => t('Off'),
+            ),
+            '#description' => t("(allow subscriptions when visitors comment)")
     );
-    
+
+    $form['left']['f1']['getresponse_comment_label'] = array(
+            '#type' => 'textfield',
+            '#title' => t('Additional text:'),
+            '#default_value' => variable_get('getresponse_comment_label', 'Sign up to our newsletter!'),
+            '#size' => 0,
+            '#minlength' => 7,
+    );
+
     $form['left']['f1']['my_info'] = array(
-      '#type' => 'item',
-      '#markup' => t('<br /><b>Where is my web form ID ??</b><br />You will find your web form ID right in your GetResponse account. Go to Web Forms => Web forms list and click on the "Source" link in a selected web form. Your web form ID is the number you will see right after the "?wid=" portion of the JavaScript code. <div class="GR_img_webform_id"></div><br /><br />'),
-    );   
-	
-	$form['right']['f2'] = array(
-        '#type' => 'fieldset', 
-        '#title' => t('GetResponse RSS'), 
-        '#weight' => 2, 
-        '#collapsible' => FALSE, 
-        '#collapsed' => FALSE,
-        );
-    
-   $rss = new GetResponseRSS;
-   $rss->url_feed = GETRESPONSE_URL_FEED;
-     
-    $form['right']['f2']['rss'] = array(
-    	'#type' => 'item',
-    	'#markup' => $rss->render_rss(),
-    	);
-        
-    $form['right']['f3'] = array(
-        '#type' => 'fieldset', 
-        '#title' => t('GetResponse Social'), 
-        '#weight' => 3, 
-        '#collapsible' => FALSE, 
-        '#collapsed' => FALSE,
-        );
-    
-    $form['right']['f3']['facebook'] = array(
-    	'#type' => 'item',
-    	'#markup' => '<a class="GR_ico sprite facebook-ico" href="http://www.facebook.com/getresponse" target="_blank" title="Facebook">Facebook</a>',
-    	);   
-    	
-	$form['right']['f3']['twitter'] = array(
-    	'#type' => 'item',
-    	'#markup' => '<a class="GR_ico sprite twitter-ico" href="http://twitter.com/getresponse" target="_blank" title="Twitter">Twitter</a>',
-    	);
-    	
-	$form['right']['f3']['linkedin'] = array(
-    	'#type' => 'item',
-    	'#markup' => '<a class="GR_ico sprite linkedin-ico" href="http://www.linkedin.com/company/implix" target="_blank" title="LinkedIn">LinkedIn</a>',
-    	);
-    	
-	$form['right']['f3']['blog'] = array(
-    	'#type' => 'item',
-    	'#markup' => '<a class="GR_ico sprite blog-ico" href="http://blog.getresponse.com/" target="_blank" title="Blog">Blog</a>',
-    	);			       	
+            '#type' => 'item',
+            '#markup' => t('<br /><b>Where is my web form ID ??</b><br />You will find your web form ID right in your GetResponse account. Go to Web Forms => Web forms list and click on the "Source" link in a selected web form. Your web form ID is the number you will see right after the "?wid=" portion of the JavaScript code. <div class="GR_img_webform_id"></div><br /><br />'),
+    );
 
-	if (!empty($_POST) && form_get_errors()) {
-    	drupal_set_message(t('The settings have not been saved because of the errors.'), 'error');
-  	}
-	return system_settings_form($form);
+    $form['right']['f2'] = array(
+            '#type' => 'fieldset',
+            '#title' => t('GetResponse RSS'),
+            '#weight' => 2,
+            '#collapsible' => FALSE,
+            '#collapsed' => FALSE,
+    );
+
+    $rss = new GetResponseRSS;
+    $rss->url_feed = GETRESPONSE_URL_FEED;
+
+    $form['right']['f2']['rss'] = array(
+            '#type' => 'item',
+            '#markup' => $rss->renderRss(),
+    );
+
+    $form['right']['f3'] = array(
+            '#type' => 'fieldset',
+            '#title' => t('GetResponse Social'),
+            '#weight' => 3,
+            '#collapsible' => FALSE,
+            '#collapsed' => FALSE,
+    );
+
+    $form['right']['f3']['facebook'] = array(
+            '#type' => 'item',
+            '#markup' => '<a class="GR_ico sprite facebook-ico" href="http://www.facebook.com/getresponse" target="_blank" title="Facebook">Facebook</a>',
+    );
+     
+    $form['right']['f3']['twitter'] = array(
+            '#type' => 'item',
+            '#markup' => '<a class="GR_ico sprite twitter-ico" href="http://twitter.com/getresponse" target="_blank" title="Twitter">Twitter</a>',
+    );
+     
+    $form['right']['f3']['linkedin'] = array(
+            '#type' => 'item',
+            '#markup' => '<a class="GR_ico sprite linkedin-ico" href="http://www.linkedin.com/company/implix" target="_blank" title="LinkedIn">LinkedIn</a>',
+    );
+     
+    $form['right']['f3']['blog'] = array(
+            '#type' => 'item',
+            '#markup' => '<a class="GR_ico sprite blog-ico" href="http://blog.getresponse.com/" target="_blank" title="Blog">Blog</a>',
+    );
+
+    if (!empty($_POST) && form_get_errors()) {
+        drupal_set_message(t('The settings have not been saved because of the errors.'), 'error');
+    }
+    return system_settings_form($form);
 
 }
 
-function getresponse_admin_validate($form, &$form_state) 
+function getresponse_admin_validate($form, &$form_state)
 {
     $webform_id = $form_state['values']['getresponse_webformid'];
     if (!is_numeric($webform_id) AND !empty($webform_id)) {
@@ -245,19 +235,18 @@ function getresponse_admin_validate($form, &$form_state)
 /**
  * Implements hook_block_info().
  */
-function getresponse_block_info() 
+function getresponse_block_info()
 {
-  $blocks['webform']['info'] = t('GetResponse WebForm');
-  // Not worth caching.
-  $blocks['webform']['cache'] = DRUPAL_NO_CACHE;
-  $blocks['webform']['properties']['administrative'] = TRUE;
-  return $blocks;
+    $blocks['webform']['info'] = t('GetResponse WebForm');
+    $blocks['webform']['cache'] = DRUPAL_NO_CACHE;
+    $blocks['webform']['properties']['administrative'] = TRUE;
+    return $blocks;
 }
 
 /**
  * Implements hook_block_view().
  */
-function getresponse_block_view($delta = '') 
+function getresponse_block_view($delta = '')
 {
     $block = array();
     $webform_id = variable_get('getresponse_webformid', '');
@@ -269,46 +258,44 @@ function getresponse_block_view($delta = '')
     elseif($style_id == 1)
     {
         $block['content'] = '<script type="text/javascript" src="' .GETRESPONSE_URL. '?wid=' .$webform_id. '"></script>';
-    }        
+    }
     return $block;
 }
 
 /**
  * Implementation of hook_form_alter().
  */
-function getresponse_form_comment_form_alter(&$form, &$form_state, $form_id) 
+function getresponse_form_comment_form_alter(&$form, &$form_state, $form_id)
 {
-	$comment_on = variable_get('getresponse_comment_on', '0');						// czy wlaczono commenty
-	
-	if(!is_login() AND $comment_on) {
-  		$form['getresponse_comment_checkbox'] = array(
-    		'#type' => 'checkbox', 
-    		'#title' => variable_get('getresponse_comment_label', 'Sign up to our newsletter!'), 
-			'#default_value' => 0
-  		);
-	}
+    $comment_on = variable_get('getresponse_comment_on', '0');						/* czy wlaczono commenty */
+
+    if(!is_login() AND $comment_on) {
+        $form['getresponse_comment_checkbox'] = array(
+                '#type' => 'checkbox',
+                '#title' => variable_get('getresponse_comment_label', 'Sign up to our newsletter!'),
+                '#default_value' => 0
+        );
+    }
 }
 
-function getresponse_comment_insert($comment) 
+function getresponse_comment_insert($comment)
 {
-	if(!is_login()) {
-		$webform_id = variable_get('getresponse_webformid', ''); 						// id webforma
-		$comment_on = variable_get('getresponse_comment_on', '0');						// czy wlaczono commenty
-		$comment_checkbox = $comment->getresponse_comment_checkbox; 					// czy kliknietu checkboxa
-		$name = urlencode($comment->name);												// nazwa
-  		$mail = urlencode($comment->mail);												// mail
-		
-		if ($comment_on AND !empty($webform_id) AND $comment_checkbox ) 
-		{			
-			getresponse_curl_contact( $comment->name, $comment->mail, $webform_id, 'GET');
-			getresponse_curl_contact( $comment->name, $comment->mail, $webform_id, 'POST');		
-		}	
-	}
+    if(!is_login()) {
+        $webform_id = variable_get('getresponse_webformid', ''); 						/* id webforma */
+        $comment_on = variable_get('getresponse_comment_on', '0');						/* czy wlaczono commenty */
+        $comment_checkbox = $comment->getresponse_comment_checkbox; 					/* czy kliknietu checkboxa */
+        $name = urlencode($comment->name);												/* nazwa */
+        $mail = urlencode($comment->mail);												/* mail */
+
+        if ($comment_on AND !empty($webform_id) AND $comment_checkbox )
+        {
+            getresponse_curl_contact( $comment->name, $comment->mail, $webform_id, 'GET');
+            getresponse_curl_contact( $comment->name, $comment->mail, $webform_id, 'POST');
+        }
+    }
 }
 
 /**
-* Implements CSS
-*/
+ * Implements CSS
+ */
 drupal_add_css(drupal_get_path('module', 'getresponse') . '/getresponse.css', array('group' => CSS_DEFAULT, 'every_page' => TRUE));
-
-?>
