@@ -179,7 +179,7 @@ function getresponse_admin() {
   );
 
   $rss = new GetResponseRSS;
-  $rss->url_feed = GETRESPONSE_URL_FEED;
+  $rss->urlFeed = GETRESPONSE_URL_FEED;
 
   $form['right']['f2']['rss'] = array(
       '#type' => 'item',
