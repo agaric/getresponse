@@ -3,7 +3,7 @@ INTRODUCTION
 Plugin Name: GetResponse Plugin
 Description: This plug-in/module enables installation of a GetResponse fully customizable sign up form on your Drupal site.
 Version: 1.0.0
-Author: Sylwester OkrÛj
+Author: Sylwester Okr√≥j
 License: GPL2
 
 
@@ -33,8 +33,8 @@ CONFIGURATION:
 
 1. Create the web form in your GetResponse account.
 2. Go to your Drupal plug-in settings.
-3. Get your GetResponse form ID (youíll learn where from the plug-in configuration window) and type it in the ìSubscribe via Web Formî field. Note that leaving the field empty will disable any previously added web form.
-4. Enable the ìSubscribe via Commentî option if you want to offer all commenting visitors to join your mailing list. Type in the invitation to subscribe e.g. ìSubscribe to join the buzzî.
+3. Get your GetResponse form ID (you‚Äôll learn where from the plug-in configuration window) and type it in the ‚ÄúSubscribe via Web Form‚Äù field. Note that leaving the field empty will disable any previously added web form.
+4. Enable the ‚ÄúSubscribe via Comment‚Äù option if you want to offer all commenting visitors to join your mailing list. Type in the invitation to subscribe e.g. ‚ÄúSubscribe to join the buzz‚Äù.
 5. Modify the position of your web form from your Drupal settings.
 
-With GetResponse form builder you can fully adjust the form to your needs: add custom fields, confirmation URLs, enable pop-up option, add image, logo etc. Note that to modify your Drupal form you need to do it from GetResponse account ñ the changes will be displayed automatically on your site.
+With GetResponse form builder you can fully adjust the form to your needs: add custom fields, confirmation URLs, enable pop-up option, add image, logo etc. Note that to modify your Drupal form you need to do it from GetResponse account ‚Äì the changes will be displayed automatically on your site.
