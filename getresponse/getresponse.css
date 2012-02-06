@@ -2,18 +2,14 @@
 #getresponse-admin .description { display: inline; }
 #getresponse-admin .form-item { margin: 3px; padding: 0px;}
 #getresponse-admin input, #getresponse-admin select { margin-right: 9px; }
-
 #edit-left { width: 700px; float: left; margin-right: 30px !important; }
 #edit-right, #edit-f3 { width: 400px; float: left}
 #edit-actions { clear: left; }
-
 #edit-getresponse-webformid { width: 120px !important; }
 #edit-getresponse-styleid { width: 126px !important; }
 #edit-getresponse-comment-label { width: 200px !important; }
-
 .GR_rss_ul { list-style: square; }
 .GR_rss_li { margin-left: 15px; }
-
 .GR_img_webform_id { width: 0 auto; height:317px; background: url("webform_id.jpg") no-repeat scroll 50% 50% transparent; }
 .sprite { background: url("sprite.png") no-repeat scroll 0 0 transparent; }
 .GR_ico { height: 16px; padding: 0 0 4px 24px; width: 16px; color: #373737; }
@@ -21,5 +17,4 @@
 .twitter-ico { background-position: 0 -30px; }
 .linkedin-ico { background-position: 0 -54px; }
 .blog-ico { background-position: 0 -78px; }
-
 .block-getresponse { border: 0 !Important; padding: 0 !Important; }
