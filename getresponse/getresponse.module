@@ -299,3 +299,4 @@ function getresponse_comment_insert($comment)
  * Implements CSS
  */
 drupal_add_css(drupal_get_path('module', 'getresponse') . '/getresponse.css', array('group' => CSS_DEFAULT, 'every_page' => TRUE));
+

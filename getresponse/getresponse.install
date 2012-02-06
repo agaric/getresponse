@@ -14,3 +14,4 @@ function getresponse_uninstall() {
     variable_del('getresponse_comment_on');
     variable_del('getresponse_comment_label');  
 }
+

@@ -4,3 +4,4 @@ package = getresponse
 core = 7.x
 version = "1.0.0"
 project = "getresponse"
+
