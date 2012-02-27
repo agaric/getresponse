@@ -1,5 +1,6 @@
 <?php
 /**
+ * @file getresponse.feed.inc
  * Functions for RSS.
  */
 
@@ -10,11 +11,11 @@ class GetResponseRSS {
   public $limit = 10;
   protected $xml;
 
- /**
- * Functions valueIn
- */
-  protected function valueIn($element_name, $xml, $content_only = TRUE) {
-    if ( $xml == FALSE ) {
+/**
+* Functions valueIn
+*/
+protected function valueIn($element_name, $xml, $content_only = TRUE) {
+    if ($xml == FALSE) {
       return FALSE;
     }
     $found = preg_match('#<'.$element_name.'(?:\s+[^>]+)?>(.*?)'.'</'.$element_name.'>#s', $xml, $matches);
