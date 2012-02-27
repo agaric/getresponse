@@ -13,8 +13,8 @@ class GetResponseRSS {
   protected $xml;
 
   /**
-  * Functions valueIn
-  */
+   * Functions valueIn
+   */
   protected function valueIn($element_name, $xml, $content_only = TRUE) {
     if ($xml == FALSE) {
       return FALSE;
@@ -29,11 +29,11 @@ class GetResponseRSS {
       }
     }
     return FALSE;
-}
+  }
 
   /**
-  * Functions elementSet
-  */
+   * Functions elementSet
+   */
   protected function elementSet($element_name, $xml, $content_only = FALSE) {
     if ($xml == FALSE) {
       return FALSE;
@@ -51,8 +51,8 @@ class GetResponseRSS {
   }
 
   /**
-  * Functions makeSafe
-  */
+   * Functions makeSafe
+   */
   protected function makeSafe($string) {
     $string = preg_replace('#<!\[CDATA\[.*?\]\]>#s', '', $string);
     $string = strip_tags($string);
@@ -67,10 +67,10 @@ class GetResponseRSS {
   }
 
   /**
-  * Functions curlRss
-  */
+   * Functions curlRss
+   */
   function curlRss() {
-    if (function_exists( 'curl_init')) {
+    if (function_exists('curl_init')) {
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_URL, $this->urlFeed);
       curl_setopt($ch, CURLOPT_HEADER, FALSE);
@@ -85,8 +85,8 @@ class GetResponseRSS {
   }
 
   /**
-  * Functions renderRss
-  */
+   * Functions renderRss
+   */
   function renderRss() {
     if ($this->curlRss()) {
       $news_items = $this->elementSet('item', $this->xml);
@@ -98,10 +98,10 @@ class GetResponseRSS {
           $description = $this->valueIn('description', $item);
           $timestamp = strtotime($this->valueIn('pubDate', $item));
           $item_array[] = array(
-              'title' => $title,
-              'url' => $url,
-              'description' => $description,
-              'timestamp' => $timestamp,
+            'title' => $title,
+            'url' => $url,
+            'description' => $description,
+            'timestamp' => $timestamp,
           );
         }
         $html = '<ul class="GR_rss_ul">';
