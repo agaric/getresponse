@@ -15,7 +15,10 @@ if (!defined('GETRESPONSE_URL_FEED')) {
   define('GETRESPONSE_URL_FEED', 'http://blog.getresponse.com/feed');
 }
 
-function is_login(){
+/**
+ * Functions is_login
+ */
+function is_login() {
   $output = $GLOBALS['user']->uid == 0 ? 0:1;
   return $output;
 }
@@ -24,7 +27,7 @@ function is_login(){
  * Functions getresponse_curl_contact
  */
 function getresponse_curl_contact( $name, $email, $webform_id, $method='GET') {
-  if ( function_exists( 'curl_init' )) {
+  if ( function_exists('curl_init')) {
     $str_url = 'type=ajax';
     $str_url .= '&name=' . urlencode($name);
     $str_url .= '&email=' . urlencode($email);
@@ -37,7 +40,7 @@ function getresponse_curl_contact( $name, $email, $webform_id, $method='GET') {
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 60);
     curl_setopt($ch, CURLOPT_TIMEOUT, 60);
     curl_setopt($ch, CURLOPT_HEADER, 0 );
-    if ( $method == 'POST' ) {
+    if ($method == 'POST') {
       curl_setopt($ch, CURLOPT_POST, 1);
       curl_setopt($ch, CURLOPT_POSTFIELDS, $str_url);
       curl_setopt($ch, CURLOPT_URL, GETRESPONSE_URL_CURL);
@@ -48,15 +51,15 @@ function getresponse_curl_contact( $name, $email, $webform_id, $method='GET') {
     }
     $output = curl_exec($ch);
     curl_close($ch);
-    return true;
+    return TRUE;
   }
   else {
-    return false;
+    return FALSE;
   }
 }
 
 /**
- * Implement hook_help().
+ * Functions getresponse_help
  */
 function getresponse_help($path, $arg) {
   switch ($path) {
@@ -66,24 +69,24 @@ function getresponse_help($path, $arg) {
 }
 
 /**
- * Implements hook_menu().
+ * Implements getresponse_menu
  */
 function getresponse_menu() {
   $items = array();
 
   $items['admin/config/services/getresponse'] = array(
-      'title' => 'GetResponse',
-      'description' => 'Configuration for GetResponse module',
-      'page callback' => 'drupal_get_form',
-      'page arguments' => array('getresponse_admin'),
-      'access arguments' => array('administer getresponse'),
-      'type' => MENU_NORMAL_ITEM,
-      'file' => 'getresponse.feed.inc',);
+    'title' => 'GetResponse',
+    'description' => 'Configuration for GetResponse module',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('getresponse_admin'),
+    'access arguments' => array('administer getresponse'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'getresponse.feed.inc',);
 
   $items['admin/config/services/getresponse/global'] = array(
-      'title' => 'Global Settings',
-      'type' => MENU_DEFAULT_LOCAL_TASK,
-      'weight' => -10,
+    'title' => 'Global Settings',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
   );
 
   return $items;
@@ -91,7 +94,7 @@ function getresponse_menu() {
 
 
 /**
- * Implements hook_admin().
+ * Implements getresponse_admin
  */
 function getresponse_admin() {
   $form = array();
@@ -214,6 +217,9 @@ function getresponse_admin() {
   return system_settings_form($form);
 }
 
+/**
+ * Function getresponse_admin_validate
+ */
 function getresponse_admin_validate($form, &$form_state) {
   $webform_id = $form_state['values']['getresponse_webformid'];
   if (!is_numeric($webform_id) AND !empty($webform_id)) {
@@ -222,7 +228,7 @@ function getresponse_admin_validate($form, &$form_state) {
 }
 
 /**
- * Implements hook_block_info().
+ * Function getresponse_block_info
  */
 function getresponse_block_info() {
   $blocks['webform']['info'] = t('GetResponse WebForm');
@@ -232,7 +238,7 @@ function getresponse_block_info() {
 }
 
 /**
- * Implements hook_block_view().
+ * Function getresponse_block_view
  */
 function getresponse_block_view($delta = '') {
   $block = array();
@@ -248,7 +254,7 @@ function getresponse_block_view($delta = '') {
 }
 
 /**
- * Implementation of hook_form_alter().
+ * Function getresponse_form_comment_form_alter
  */
 function getresponse_form_comment_form_alter(&$form, &$form_state, $form_id) {
   $comment_on = variable_get('getresponse_comment_on', '0');						/* czy wlaczono commenty */
@@ -261,6 +267,9 @@ function getresponse_form_comment_form_alter(&$form, &$form_state, $form_id) {
   }
 }
 
+/**
+ * Function getresponse_comment_insert
+ */
 function getresponse_comment_insert($comment) {
   if (!is_login()) {
     $webform_id = variable_get('getresponse_webformid', ''); 						/* id webforma */
