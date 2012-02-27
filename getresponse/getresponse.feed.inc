@@ -12,10 +12,10 @@ class GetResponseRSS {
   public $limit = 10;
   protected $xml;
 
-/**
-* Functions valueIn
-*/
-protected function valueIn($element_name, $xml, $content_only = TRUE) {
+  /**
+  * Functions valueIn
+  */
+  protected function valueIn($element_name, $xml, $content_only = TRUE) {
     if ($xml == FALSE) {
       return FALSE;
     }
@@ -23,17 +23,17 @@ protected function valueIn($element_name, $xml, $content_only = TRUE) {
     if ($found != FALSE) {
       if ($content_only) {
         return $matches[1];
-      } 
+      }
       else {
         return $matches[0];
       }
     }
     return FALSE;
-  }
+}
 
-/**
- * Functions elementSet
- */
+  /**
+  * Functions elementSet
+  */
   protected function elementSet($element_name, $xml, $content_only = FALSE) {
     if ($xml == FALSE) {
       return FALSE;
@@ -50,9 +50,9 @@ protected function valueIn($element_name, $xml, $content_only = TRUE) {
     return FALSE;
   }
 
-/**
- * Functions makeSafe
- */
+  /**
+  * Functions makeSafe
+  */
   protected function makeSafe($string) {
     $string = preg_replace('#<!\[CDATA\[.*?\]\]>#s', '', $string);
     $string = strip_tags($string);
@@ -66,11 +66,11 @@ protected function valueIn($element_name, $xml, $content_only = TRUE) {
     return $string;
   }
 
-/**
- * Functions curlRss
- */
+  /**
+  * Functions curlRss
+  */
   function curlRss() {
-    if (function_exists( 'curl_init') ) {
+    if (function_exists( 'curl_init')) {
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_URL, $this->urlFeed);
       curl_setopt($ch, CURLOPT_HEADER, FALSE);
@@ -78,21 +78,21 @@ protected function valueIn($element_name, $xml, $content_only = TRUE) {
       $this->xml = curl_exec($ch);
       curl_close($ch);
       return TRUE;
-    } 
+    }
     else {
       return FALSE;
     }
   }
 
-/**
- * Functions renderRss
- */
+  /**
+  * Functions renderRss
+  */
   function renderRss() {
     if ($this->curlRss()) {
       $news_items = $this->elementSet('item', $this->xml);
 
       if (is_array($news_items)) {
-        foreach( $news_items as $item ) {
+        foreach ($news_items as $item) {
           $title = $this->valueIn('title', $item);
           $url = $this->valueIn('link', $item);
           $description = $this->valueIn('description', $item);
@@ -101,7 +101,7 @@ protected function valueIn($element_name, $xml, $content_only = TRUE) {
               'title' => $title,
               'url' => $url,
               'description' => $description,
-              'timestamp' => $timestamp
+              'timestamp' => $timestamp,
           );
         }
         $html = '<ul class="GR_rss_ul">';
@@ -110,7 +110,7 @@ protected function valueIn($element_name, $xml, $content_only = TRUE) {
         if (sizeof($news_items) > 0) {
           foreach ($item_array as $item) {
             $html .= '<li class="GR_rss_li">';
-            $html .= '<a href="'.$this->makeSafe($item['url']).'" target="_blank">'.$this->makeSafe($item['title']).'</a>';
+            $html .= '<a href="' . $this->makeSafe($item['url']) . '" target="_blank">' . $this->makeSafe($item['title']) . '</a>';
             $html .= '</li>';
             // Limit the output.
             if (++$count == $this->limit) {
