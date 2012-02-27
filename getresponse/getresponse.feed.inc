@@ -1,9 +1,8 @@
 <?php
 /**
- * @file
  * Functions for RSS.
- * 
  */
+
 define('ELEMENT_CONTENT_ONLY', TRUE);
 define('ELEMENT_PRESERVE_TAGS', FALSE);
 class GetResponseRSS {
@@ -11,6 +10,9 @@ class GetResponseRSS {
   public $limit = 10;
   protected $xml;
 
+ /**
+ * Functions valueIn
+ */
   protected function valueIn($element_name, $xml, $content_only = TRUE) {
     if ( $xml == FALSE ) {
       return FALSE;
@@ -26,6 +28,9 @@ class GetResponseRSS {
     return FALSE;
   }
 
+/**
+ * Functions elementSet
+ */
   protected function elementSet($element_name, $xml, $content_only = FALSE) {
     if ( $xml == FALSE ) {
       return FALSE;
@@ -41,6 +46,9 @@ class GetResponseRSS {
     return FALSE;
   }
 
+/**
+ * Functions makeSafe
+ */
   protected function makeSafe($string) {
     $string = preg_replace('#<!\[CDATA\[.*?\]\]>#s', '', $string);
     $string = strip_tags($string);
@@ -54,6 +62,9 @@ class GetResponseRSS {
     return $string;
   }
 
+/**
+ * Functions curlRss
+ */
   function curlRss() {
     if ( function_exists( 'curl_init' ) ) {
       $ch = curl_init();
@@ -68,6 +79,9 @@ class GetResponseRSS {
     }
   }
 
+/**
+ * Functions renderRss
+ */
   function renderRss() {
     if ( $this->curlRss() ) {
       $news_items = $this->elementSet('item', $this->xml);

@@ -22,13 +22,13 @@
 #edit-right,
 #edit-f3 {
   width: 400px;
-  float: left
+  float: left;
 }
 #edit-actions {
   clear: left;
 }
 #edit-getresponse-webformid {
-  width: 120px !important; 
+  width: 120px !important;
 }
 #edit-getresponse-styleid {
   width: 126px !important;
@@ -44,7 +44,7 @@
 }
 .GR_img_webform_id {
   width: 0 auto;
-  height:317px;
+  height: 317px;
   background: url("webform_id.jpg") no-repeat scroll 50% 50% transparent;
 }
 .sprite {
