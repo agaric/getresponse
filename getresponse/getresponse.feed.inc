@@ -2,47 +2,46 @@
 /**
  * @file
  * Functions for RSS.
+ * 
  */
 define('ELEMENT_CONTENT_ONLY', TRUE);
 define('ELEMENT_PRESERVE_TAGS', FALSE);
 class GetResponseRSS {
   public $urlFeed;
   public $limit = 10;
-  private $xml;
+  protected $xml;
 
-  private function valueIn($element_name, $xml, $content_only = TRUE) {
-    if ($xml == FALSE) {
+  protected function valueIn($element_name, $xml, $content_only = TRUE) {
+    if ( $xml == FALSE ) {
       return FALSE;
     }
     $found = preg_match('#<'.$element_name.'(?:\s+[^>]+)?>(.*?)'.'</'.$element_name.'>#s', $xml, $matches);
-    if ($found != FALSE) {
-      if ($content_only) {
-        return $matches[1];  //ignore the enclosing tags
+    if ( $found != FALSE ) {
+      if ( $content_only ) {
+        return $matches[1];
       } else {
-        return $matches[0];  //return the full pattern match
+        return $matches[0];
       }
     }
-    // No match found: return FALSE.
     return FALSE;
   }
 
-  private function elementSet($element_name, $xml, $content_only = FALSE) {
-    if ($xml == FALSE) {
+  protected function elementSet($element_name, $xml, $content_only = FALSE) {
+    if ( $xml == FALSE ) {
       return FALSE;
     }
     $found = preg_match_all('#<'.$element_name.'(?:\s+[^>]+)?>' .'(.*?)</'.$element_name.'>#s',$xml, $matches, PREG_PATTERN_ORDER);
-    if ($found != FALSE) {
-      if ($content_only) {
-        return $matches[1];  //ignore the enlosing tags
+    if ( $found != FALSE ) {
+      if ( $content_only ) {
+        return $matches[1];
       } else {
-        return $matches[0];  //return the full pattern match
+        return $matches[0];
       }
     }
-    // No match found: return FALSE.
     return FALSE;
   }
 
-  private function makeSafe($string) {
+  protected function makeSafe($string) {
     $string = preg_replace('#<!\[CDATA\[.*?\]\]>#s', '', $string);
     $string = strip_tags($string);
     $string = str_replace('<', '&lt;', $string);
@@ -56,8 +55,7 @@ class GetResponseRSS {
   }
 
   function curlRss() {
-    if ( function_exists( 'curl_init' ) )
-    {
+    if ( function_exists( 'curl_init' ) ) {
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_URL, $this->urlFeed);
       curl_setopt($ch, CURLOPT_HEADER, FALSE);
@@ -66,7 +64,6 @@ class GetResponseRSS {
       curl_close($ch);
       return TRUE;
     } else {
-
       return FALSE;
     }
   }
@@ -75,9 +72,8 @@ class GetResponseRSS {
     if ( $this->curlRss() ) {
       $news_items = $this->elementSet('item', $this->xml);
 
-      if ( is_array($news_items) )
-      {
-        foreach($news_items as $item) {
+      if ( is_array($news_items) ) {
+        foreach( $news_items as $item ) {
           $title = $this->valueIn('title', $item);
           $url = $this->valueIn('link', $item);
           $description = $this->valueIn('description', $item);
@@ -92,13 +88,13 @@ class GetResponseRSS {
         $html = '<ul class="GR_rss_ul">';
         $count = 0;
 
-        if (sizeof($news_items) > 0) {
+        if ( sizeof($news_items) > 0 ) {
           foreach ($item_array as $item) {
             $html .= '<li class="GR_rss_li">';
             $html .= '<a href="'.$this->makeSafe($item['url']).'" target="_blank">'.$this->makeSafe($item['title']).'</a>';
             $html .= '</li>';
             // Limit the output.
-            if (++$count == $this->limit) {
+            if ( ++$count == $this->limit ) {
               break;
             }
           }
