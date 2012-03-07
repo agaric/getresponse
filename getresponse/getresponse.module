@@ -23,7 +23,7 @@ function is_login() {
     $output = 0;
   }
   else {
-  	$output = 1;
+    $output = 1;
   }
   return $output;
 }
@@ -94,7 +94,7 @@ function getresponse_admin() {
     '#markup' => t('<h3>Subscribe via Web Form</h3>'),
   );
 
-  $form['left']['f1'] ['getresponse_webformid'] = array(
+  $form['left']['f1']['getresponse_webformid'] = array(
     '#type' => 'textfield',
     '#title' => t('Web form ID:'),
     '#default_value' => variable_get('getresponse_webformid', ''),
