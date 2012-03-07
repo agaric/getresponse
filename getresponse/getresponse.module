@@ -19,43 +19,26 @@ if (!defined('GETRESPONSE_URL_FEED')) {
  * Functions is_login
  */
 function is_login() {
-  $output = $GLOBALS['user']->uid == 0 ? 0:1;
+  if ($GLOBALS['user']->uid == 0) {
+    $output = 0;
+  }
+  else {
+  	$output = 1;
+  }
   return $output;
 }
 
 /**
  * Functions getresponse_curl_contact
  */
-function getresponse_curl_contact($name, $email, $webform_id, $method = 'GET') {
-  if (function_exists('curl_init')) {
-    $str_url = 'type=ajax';
-    $str_url .= '&name=' . urlencode($name);
-    $str_url .= '&email=' . urlencode($email);
-    $str_url .= '&webform_id=' . $webform_id;
-    $str_url .= '&submit=Sign%20Up!';
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_AUTOREFERER, 1);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 60);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 60);
-    curl_setopt($ch, CURLOPT_HEADER, 0);
-    if ($method == 'POST') {
-      curl_setopt($ch, CURLOPT_POST, 1);
-      curl_setopt($ch, CURLOPT_POSTFIELDS, $str_url);
-      curl_setopt($ch, CURLOPT_URL, GETRESPONSE_URL_CURL);
-    }
-    else {
-      curl_setopt($ch, CURLOPT_POST, 0);
-      curl_setopt($ch, CURLOPT_URL, GETRESPONSE_URL_CURL . '?' . $str_url);
-    }
-    $output = curl_exec($ch);
-    curl_close($ch);
-    return TRUE;
-  }
-  else {
-    return FALSE;
-  }
+function getresponse_add_contact($name, $email, $webform_id, $method) {
+  $data = 'type=ajax&name=' . urlencode($name) . '&email=' . urlencode($email) . '&webform_id=' . $webform_id;
+  $options = array(
+    'method' => $method,
+    'data' => $data,
+    'headers' => array('Content-Type' => 'application/x-www-form-urlencoded'),
+  );
+  drupal_http_request(GETRESPONSE_URL_CURL, $options);
 }
 
 /**
@@ -64,7 +47,7 @@ function getresponse_curl_contact($name, $email, $webform_id, $method = 'GET') {
 function getresponse_help($path, $arg) {
   switch ($path) {
     case 'admin/help#getresponse':
-      return '<p>Help page.</p>';
+      return '<b>Where is my web form ID ??</b><br />You will find your web form ID right in your GetResponse account. Go to Web Forms => Web forms list and click on the "Source" link in a selected web form. Your web form ID is the number you will see right after the "?wid=" portion of the JavaScript code. <div class="GR_img_webform_id"></div>';
   }
 }
 
@@ -82,13 +65,6 @@ function getresponse_menu() {
     'access arguments' => array('administer getresponse'),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'getresponse.feed.inc',);
-
-  $items['admin/config/services/getresponse/global'] = array(
-    'title' => 'Global Settings',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -10,
-  );
-
   return $items;
 }
 
@@ -278,14 +254,9 @@ function getresponse_comment_insert($comment) {
     $name = urlencode($comment->name);												/* nazwa */
     $mail = urlencode($comment->mail);												/* mail */
 
-    if ($comment_on AND !empty($webform_id) AND $comment_checkbox) {
-      getresponse_curl_contact($comment->name, $comment->mail, $webform_id, 'GET');
-      getresponse_curl_contact($comment->name, $comment->mail, $webform_id, 'POST');
+    if ($comment_on AND !empty($webform_id) AND !empty($mail) AND $comment_checkbox) {
+      getresponse_add_contact($comment->name, $comment->mail, $webform_id, 'GET');
+      getresponse_add_contact($comment->name, $comment->mail, $webform_id, 'POST');
     }
   }
 }
-
-/**
- * Implements CSS
- */
-drupal_add_css(drupal_get_path('module', 'getresponse') . '/getresponse.css', array('group' => CSS_DEFAULT, 'every_page' => TRUE));
