@@ -20,12 +20,11 @@ if (!defined('GETRESPONSE_URL_FEED')) {
  */
 function is_login() {
   if ($GLOBALS['user']->uid == 0) {
-    $output = 0;
+    return 0;
   }
   else {
-    $output = 1;
+    return 1;
   }
-  return $output;
 }
 
 /**
