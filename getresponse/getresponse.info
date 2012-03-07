@@ -1,7 +1,5 @@
 name = GetResponse
 description = This plug-in/module enables installation of a GetResponse fully customizable sign up form on your Drupal site.
-package = getresponse
 core = 7.x
-project = "getresponse"
 stylesheets[all][] = getresponse.css
 configure = admin/config/services/getresponse
