@@ -15,14 +15,14 @@
   margin-right: 9px;
 }
 #edit-left {
-  width: 700px;
   float: left;
   margin-right: 30px !important;
+  width: 700px;
 }
 #edit-right,
 #edit-f3 {
-  width: 400px;
   float: left;
+  width: 400px;
 }
 #edit-actions {
   clear: left;
@@ -43,18 +43,18 @@
   margin-left: 15px;
 }
 .GR_img_webform_id {
-  width: 0 auto;
-  height: 317px;
   background: url("webform_id.jpg") no-repeat scroll 50% 50% transparent;
+  height: 317px;
+  width: 0 auto;
 }
 .sprite {
   background: url("sprite.png") no-repeat scroll 0 0 transparent;
 }
 .GR_ico {
+  color: #373737;
   height: 16px;
   padding: 0 0 4px 24px;
   width: 16px;
-  color: #373737;
 }
 .facebook-ico {
   background-position: 0 -6px;
