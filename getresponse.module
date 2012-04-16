@@ -10,9 +10,9 @@ define('GETRESPONSE_URL_CURL', 'http://app.getresponse.com/add_contact_webform.h
 define('GETRESPONSE_URL_FEED', 'http://blog.getresponse.com/feed');
 
 /**
- * Functions is_login
+ * Functions getresponse_is_login
  */
-function is_login() {
+function getresponse_is_login() {
   if ($GLOBALS['user']->uid == 0) {
     return 0;
   }
@@ -51,8 +51,8 @@ function getresponse_menu() {
   $items = array();
 
   $items['admin/config/services/getresponse'] = array(
-    'title' => t('GetResponse'),
-    'description' => t('Configuration for GetResponse module'),
+    'title' => 'GetResponse',
+    'description' => 'Configuration for GetResponse module',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('getresponse_admin'),
     'access arguments' => array('administer getresponse'),
@@ -228,7 +228,7 @@ function getresponse_block_view($delta = '') {
 function getresponse_form_comment_form_alter(&$form, &$form_state, $form_id) {
   $webform_id = variable_get('getresponse_webformid', '');							/* id webforma */
   $comment_on = variable_get('getresponse_comment_on', '0');						/* czy wlaczono commenty */
-  if (!is_login() AND $comment_on AND !empty($webform_id)) {
+  if (!getresponse_is_login() AND $comment_on AND !empty($webform_id)) {
     $form['getresponse_comment_checkbox'] = array(
       '#type' => 'checkbox',
       '#title' => variable_get('getresponse_comment_label', 'Sign up to our newsletter!'),
@@ -241,7 +241,7 @@ function getresponse_form_comment_form_alter(&$form, &$form_state, $form_id) {
  * Function getresponse_comment_insert
  */
 function getresponse_comment_insert($comment) {
-  if (!is_login()) {
+  if (!getresponse_is_login()) {
     $webform_id = variable_get('getresponse_webformid', ''); 						/* id webforma */
     $comment_on = variable_get('getresponse_comment_on', '0');						/* czy wlaczono commenty */
     $comment_checkbox = $comment->getresponse_comment_checkbox; 					/* czy kliknietu checkboxa */
