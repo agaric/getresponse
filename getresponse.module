@@ -226,8 +226,9 @@ function getresponse_block_view($delta = '') {
  * Function getresponse_form_comment_form_alter
  */
 function getresponse_form_comment_form_alter(&$form, &$form_state, $form_id) {
+  $webform_id = variable_get('getresponse_webformid', '');							/* id webforma */
   $comment_on = variable_get('getresponse_comment_on', '0');						/* czy wlaczono commenty */
-  if (!is_login() AND $comment_on) {
+  if (!is_login() AND $comment_on AND !empty($webform_id)) {
     $form['getresponse_comment_checkbox'] = array(
       '#type' => 'checkbox',
       '#title' => variable_get('getresponse_comment_label', 'Sign up to our newsletter!'),
