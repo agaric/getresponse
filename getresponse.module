@@ -5,15 +5,9 @@
  * GetResponse module.
  */
 
-if (!defined('GETRESPONSE_URL')) {
-  define('GETRESPONSE_URL', 'http://getresponse.com/view_webform.js');
-}
-if (!defined('GETRESPONSE_URL_CURL')) {
-  define('GETRESPONSE_URL_CURL', 'http://app.getresponse.com/add_contact_webform.html');
-}
-if (!defined('GETRESPONSE_URL_FEED')) {
-  define('GETRESPONSE_URL_FEED', 'http://blog.getresponse.com/feed');
-}
+define('GETRESPONSE_URL', 'http://getresponse.com/view_webform.js');
+define('GETRESPONSE_URL_CURL', 'http://app.getresponse.com/add_contact_webform.html');
+define('GETRESPONSE_URL_FEED', 'http://blog.getresponse.com/feed');
 
 /**
  * Functions is_login
@@ -46,7 +40,7 @@ function getresponse_add_contact($name, $email, $webform_id, $method) {
 function getresponse_help($path, $arg) {
   switch ($path) {
     case 'admin/help#getresponse':
-      return '<b>Where is my web form ID ??</b><br />You will find your web form ID right in your GetResponse account. Go to Web Forms => Web forms list and click on the "Source" link in a selected web form. Your web form ID is the number you will see right after the "?wid=" portion of the JavaScript code. <div class="GR_img_webform_id"></div>';
+      return t('<b>Where is my web form ID ??</b><br />You will find your web form ID right in your GetResponse account. Go to Web Forms => Web forms list and click on the "Source" link in a selected web form. Your web form ID is the number you will see right after the "?wid=" portion of the JavaScript code. <div class="GR_img_webform_id"></div>');
   }
 }
 
@@ -57,8 +51,8 @@ function getresponse_menu() {
   $items = array();
 
   $items['admin/config/services/getresponse'] = array(
-    'title' => 'GetResponse',
-    'description' => 'Configuration for GetResponse module',
+    'title' => t('GetResponse'),
+    'description' => t('Configuration for GetResponse module'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('getresponse_admin'),
     'access arguments' => array('administer getresponse'),
