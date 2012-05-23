@@ -10,7 +10,7 @@ define('GETRESPONSE_URL_CURL', 'http://app.getresponse.com/add_contact_webform.h
 define('GETRESPONSE_URL_FEED', 'http://blog.getresponse.com/feed');
 
 /**
- * Functions getresponse_is_login
+ * Functions getresponse_is_login.
  */
 function getresponse_is_login() {
   if ($GLOBALS['user']->uid == 0) {
@@ -22,7 +22,7 @@ function getresponse_is_login() {
 }
 
 /**
- * Functions getresponse_curl_contact
+ * Functions getresponse_curl_contact.
  */
 function getresponse_add_contact($name, $email, $webform_id, $method) {
   $data = 'type=ajax&name=' . urlencode($name) . '&email=' . urlencode($email) . '&webform_id=' . $webform_id;
@@ -35,7 +35,7 @@ function getresponse_add_contact($name, $email, $webform_id, $method) {
 }
 
 /**
- * Functions getresponse_help
+ * Functions getresponse_help.
  */
 function getresponse_help($path, $arg) {
   switch ($path) {
@@ -45,7 +45,7 @@ function getresponse_help($path, $arg) {
 }
 
 /**
- * Implements getresponse_menu
+ * Implements getresponse_menu.
  */
 function getresponse_menu() {
   $items = array();
@@ -61,9 +61,8 @@ function getresponse_menu() {
   return $items;
 }
 
-
 /**
- * Implements getresponse_admin
+ * Implements getresponse_admin.
  */
 function getresponse_admin() {
   $form = array();
@@ -187,7 +186,7 @@ function getresponse_admin() {
 }
 
 /**
- * Function getresponse_admin_validate
+ * Function getresponse_admin_validate.
  */
 function getresponse_admin_validate($form, &$form_state) {
   $webform_id = $form_state['values']['getresponse_webformid'];
@@ -197,7 +196,7 @@ function getresponse_admin_validate($form, &$form_state) {
 }
 
 /**
- * Function getresponse_block_info
+ * Function getresponse_block_info.
  */
 function getresponse_block_info() {
   $blocks['webform']['info'] = t('GetResponse WebForm');
@@ -207,7 +206,7 @@ function getresponse_block_info() {
 }
 
 /**
- * Function getresponse_block_view
+ * Function getresponse_block_view.
  */
 function getresponse_block_view($delta = '') {
   $block = array();
@@ -223,7 +222,7 @@ function getresponse_block_view($delta = '') {
 }
 
 /**
- * Function getresponse_form_comment_form_alter
+ * Function getresponse_form_comment_form_alter.
  */
 function getresponse_form_comment_form_alter(&$form, &$form_state, $form_id) {
   $webform_id = variable_get('getresponse_webformid', '');							/* id webforma */
@@ -238,7 +237,7 @@ function getresponse_form_comment_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
- * Function getresponse_comment_insert
+ * Function getresponse_comment_insert.
  */
 function getresponse_comment_insert($comment) {
   if (!getresponse_is_login()) {

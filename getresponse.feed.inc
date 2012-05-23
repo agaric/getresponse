@@ -13,7 +13,7 @@ class GetResponseRSS {
   protected $xml;
 
   /**
-   * Functions valueIn
+   * Functions valueIn.
    */
   protected function valueIn($element_name, $xml, $content_only = TRUE) {
     if ($xml == FALSE) {
@@ -32,7 +32,7 @@ class GetResponseRSS {
   }
 
   /**
-   * Functions elementSet
+   * Functions elementSet.
    */
   protected function elementSet($element_name, $xml, $content_only = FALSE) {
     if ($xml == FALSE) {
@@ -51,7 +51,7 @@ class GetResponseRSS {
   }
 
   /**
-   * Functions makeSafe
+   * Functions makeSafe.
    */
   protected function makeSafe($string) {
     $string = preg_replace('#<!\[CDATA\[.*?\]\]>#s', '', $string);
@@ -67,7 +67,7 @@ class GetResponseRSS {
   }
 
   /**
-   * Functions curlRss
+   * Functions curlRss.
    */
   function curlRss() {
     if (function_exists('curl_init')) {
@@ -85,7 +85,7 @@ class GetResponseRSS {
   }
 
   /**
-   * Functions renderRss
+   * Functions renderRss.
    */
   function renderRss() {
     if ($this->curlRss()) {
