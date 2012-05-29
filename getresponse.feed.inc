@@ -4,6 +4,7 @@
  * @file
  * GetResponseRSS Class.
  */
+
 class GetResponseRss {
 
   /**
@@ -34,8 +35,8 @@ class GetResponseRss {
    * Function return RSS data as html string.
    */
   public function renderRss() {
-  	$result = drupal_http_request(GETRESPONSE_URL_FEED);
-  	if (!isset($result->error)) {
+    $result = drupal_http_request(GETRESPONSE_URL_FEED);
+    if (!isset($result->error)) {
       $news_items = $this->parseXMLdata('item', $result->data, FALSE, TRUE);
       if (is_array($news_items)) {
         foreach ($news_items as $item) {
