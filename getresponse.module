@@ -8,21 +8,23 @@
 define('GETRESPONSE_URL', 'http://getresponse.com/view_webform.js');
 define('GETRESPONSE_URL_CURL', 'http://app.getresponse.com/add_contact_webform.html');
 define('GETRESPONSE_URL_FEED', 'http://blog.getresponse.com/feed');
+define('GETRESPONSE_URL_FEED_LIMIT', 10);
 
 /**
- * Functions getresponse_is_login.
+ * Check if user is login, return Boolean TRUE/FALSE value.
  */
 function getresponse_is_login() {
-  if ($GLOBALS['user']->uid == 0) {
-    return 0;
+  global $user;
+  if ($user->uid == 0) {
+    return FALSE;
   }
   else {
-    return 1;
+    return TRUE;
   }
 }
 
 /**
- * Functions getresponse_curl_contact.
+ * Send visitor name and email to GetResponse Webform.
  */
 function getresponse_add_contact($name, $email, $webform_id, $method) {
   $data = 'type=ajax&name=' . urlencode($name) . '&email=' . urlencode($email) . '&webform_id=' . $webform_id;
@@ -35,7 +37,7 @@ function getresponse_add_contact($name, $email, $webform_id, $method) {
 }
 
 /**
- * Functions getresponse_help.
+ * Implements hook_help().
  */
 function getresponse_help($path, $arg) {
   switch ($path) {
@@ -45,7 +47,7 @@ function getresponse_help($path, $arg) {
 }
 
 /**
- * Implements getresponse_menu.
+ * Implements hook_menu().
  */
 function getresponse_menu() {
   $items = array();
@@ -62,7 +64,7 @@ function getresponse_menu() {
 }
 
 /**
- * Implements getresponse_admin.
+ * Implements hook_admin().
  */
 function getresponse_admin() {
   $form = array();
@@ -142,8 +144,7 @@ function getresponse_admin() {
     '#collapsed' => FALSE,
   );
 
-  $rss = new GetResponseRSS();
-  $rss->urlFeed = GETRESPONSE_URL_FEED;
+  $rss = new GetResponseRss();
 
   $form['right']['f2']['rss'] = array(
     '#type' => 'item',
@@ -186,17 +187,17 @@ function getresponse_admin() {
 }
 
 /**
- * Function getresponse_admin_validate.
+ * Implements hook_admin_validate().
  */
 function getresponse_admin_validate($form, &$form_state) {
   $webform_id = $form_state['values']['getresponse_webformid'];
-  if (!is_numeric($webform_id) AND !empty($webform_id)) {
+  if (!is_numeric($webform_id) && !empty($webform_id)) {
     form_set_error('getresponse_webformid', t('You must enter an integer or leave empty to disable.'));
   }
 }
 
 /**
- * Function getresponse_block_info.
+ * Implements hook_block_info().
  */
 function getresponse_block_info() {
   $blocks['webform']['info'] = t('GetResponse WebForm');
@@ -206,7 +207,7 @@ function getresponse_block_info() {
 }
 
 /**
- * Function getresponse_block_view.
+ * Implements hook_block_view().
  */
 function getresponse_block_view($delta = '') {
   $block = array();
@@ -222,12 +223,12 @@ function getresponse_block_view($delta = '') {
 }
 
 /**
- * Function getresponse_form_comment_form_alter.
+ * Implements hook_form_comment_form_alter().
  */
 function getresponse_form_comment_form_alter(&$form, &$form_state, $form_id) {
-  $webform_id = variable_get('getresponse_webformid', '');							/* id webforma */
-  $comment_on = variable_get('getresponse_comment_on', '0');						/* czy wlaczono commenty */
-  if (!getresponse_is_login() AND $comment_on AND !empty($webform_id)) {
+  $webform_id = variable_get('getresponse_webformid', '');
+  $comment_on = variable_get('getresponse_comment_on', '0');
+  if (!getresponse_is_login() && $comment_on && !empty($webform_id)) {
     $form['getresponse_comment_checkbox'] = array(
       '#type' => 'checkbox',
       '#title' => variable_get('getresponse_comment_label', 'Sign up to our newsletter!'),
@@ -237,17 +238,14 @@ function getresponse_form_comment_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
- * Function getresponse_comment_insert.
+ * Implements hook_comment_insert().
  */
 function getresponse_comment_insert($comment) {
   if (!getresponse_is_login()) {
-    $webform_id = variable_get('getresponse_webformid', ''); 						/* id webforma */
-    $comment_on = variable_get('getresponse_comment_on', '0');						/* czy wlaczono commenty */
-    $comment_checkbox = $comment->getresponse_comment_checkbox; 					/* czy kliknietu checkboxa */
-    $name = urlencode($comment->name);												/* nazwa */
-    $mail = urlencode($comment->mail);												/* mail */
-
-    if ($comment_on AND !empty($webform_id) AND !empty($mail) AND $comment_checkbox) {
+    $webform_id = variable_get('getresponse_webformid', '');
+    $comment_on = variable_get('getresponse_comment_on', '0');
+    $comment_checkbox = $comment->getresponse_comment_checkbox;
+    if ($comment_on && !empty($webform_id) && !empty($mail) && $comment_checkbox) {
       getresponse_add_contact($comment->name, $comment->mail, $webform_id, 'GET');
       getresponse_add_contact($comment->name, $comment->mail, $webform_id, 'POST');
     }
