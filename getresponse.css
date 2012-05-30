@@ -8,7 +8,7 @@
 }
 #getresponse-admin .form-item {
   margin: 3px;
-  padding: 0px;
+  padding: 0;
 }
 #getresponse-admin input,
 #getresponse-admin select {
@@ -45,7 +45,7 @@
 .GR_img_webform_id {
   background: url("webform_id.jpg") no-repeat scroll 50% 50% transparent;
   height: 317px;
-  width: 0 auto;
+  margin: 0 auto;
 }
 .sprite {
   background: url("sprite.png") no-repeat scroll 0 0 transparent;
@@ -69,6 +69,6 @@
   background-position: 0 -78px;
 }
 .block-getresponse {
-  border: 0 !Important;
-  padding: 0 !Important;
+  border: 0 !important;
+  padding: 0 !important;
 }
