@@ -27,16 +27,16 @@ function getresponse_is_logged_in() {
 
 /**
  * Send visitor name and email to GetResponse Webform.
- * 
+ *
  * @param string $name
  *   real name of the visitor
- * 
+ *
  * @param string $email
  *   e-mail address of the visitor
- * 
+ *
  * @param string $webform_id
  *   numeric webForm id from getresponse.com
- * 
+ *
  * @param string $method
  *   POST or GET
  */
@@ -238,12 +238,12 @@ function getresponse_block_view($delta = '') {
  */
 function getresponse_form_comment_form_alter(&$form, &$form_state, $form_id) {
   $webform_id = variable_get('getresponse_webformid', '');
-  $comment_on = variable_get('getresponse_comment_on', '0'); 
+  $comment_on = variable_get('getresponse_comment_on', '0');
   $can_enter_email = FALSE;
   if (variable_get('comment_anonymous_' . str_replace('comment_node_', '', $form_state['comment']->node_type), COMMENT_ANONYMOUS_MAYNOT_CONTACT) == COMMENT_ANONYMOUS_MUST_CONTACT) {
     $can_enter_email = TRUE;
   }
-  if (!getresponse_is_logged_in() && $comment_on && !empty($webform_id) && $can_enter_email) { 
+  if (!getresponse_is_logged_in() && $comment_on && !empty($webform_id) && $can_enter_email) {
     $form['getresponse_comment_checkbox'] = array(
       '#type' => 'checkbox',
       '#title' => variable_get('getresponse_comment_label', 'Sign up to our newsletter!'),
