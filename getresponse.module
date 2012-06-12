@@ -56,7 +56,40 @@ function getresponse_add_contact($name, $email, $webform_id, $method) {
 function getresponse_help($path, $arg) {
   switch ($path) {
     case 'admin/help#getresponse':
-      return t('<strong>Where is my web form ID ?</strong><br />You will find your web form ID right in your GetResponse account. Go to Web Forms => Web forms list and click on the "Source" link in a selected web form. Your web form ID is the number you will see right after the "?wid=" portion of the JavaScript code. <div class="GR_img_webform_id"></div>');
+      $output = '';
+      $output .= '<h3>' . t("About") . '</h3>';
+      $output .= '<p>' . t("This plug-in/module enables installation of a GetResponse fully customizable sign up form on your Drupal site.");
+      $output .= '<br/>' . t("To find out more about GetResponse, please visit: <a href='http://www.getresponse.com/about-us'>http://www.getresponse.com/about-us</a>") . '</p>';
+      $output .= '<h2>' . t("To use GetResponse web forms on a Drupal web page, follow these instructions:") . '</h3>';
+      $output .= '<ol>';
+      $output .= '<p><strong>' . t("In GetResponse, find the WID tag.") . '</strong></p>';
+      $output .= '<li>' . t("Log in to your GetResponse account.") . '</li>';
+      $output .= '<li>' . t("Create a new web form by clicking Web Forms -> Create new or choose an existing web form by clicking Web Forms -> Web Forms list.") . '</li>';
+      $output .= '<li>' . t("If you are designing a new form, advance to the “Publish” screen and scroll down to view the HTML code. If you are using an existing form, click Web Forms -> Web Forms list then click the “view source” link for the form you select.") . '</li>';
+      $output .= '<li>' . t("In the HTML code, find the URL of the Web Form and copy the WID number. It's the number that follows “WID=”.") . '</li>';
+      $output .= '<p><strong>' . t("In Drupal, enter the GetResponse WID tag.") . '</strong></p>';
+      $output .= '<li>' . t("To change the layout of the web form on your Drupal page, log in to your Drupal admin account. Go to “Configuration”, scroll down to the Web Services section and click “GetResponse”.") . '</li>';
+      $output .= '<li>' . t("In the Web form ID field, enter the WID tag you found in your GetResponse web form editor page.") . '</li>';
+      $output .= '<li>' . t("In the “Style” pulldown menu, choose the GetResponse layout or the Drupal standard layout for web forms.") . '</li>';
+      $output .= '<li>' . t("Last but not least, decide where the GetResponse web form should appear on your website. Click “Structure -> Blocks”, scroll down to the “Disabled” section and locate the pulldown menu beside the GetResponse WebForm plugin. Click to select the position where the web form should be shown. ") . '</li>';
+      $output .= '</ol>';
+      $output .= '<p></p>';
+      $output .= '<h3>' . t("To enable blog readers to subscribe to your GetResponse campaigns via blog comments, follow these instructions:") . '</h3>';
+      $output .= '<ol>';
+      $output .= '<p><strong>' . t("In GetResponse, find the WID tag.") . '</strong></p>';
+      $output .= '<li>' . t("Log in to your GetResponse account.") . '</li>';
+      $output .= '<li>' . t("Create a new web form by clicking Web Forms -> Create new or choose an existing web form by clicking Web Forms -> Web Forms list.") . '</li>';
+      $output .= '<li>' . t("If you are designing a new form, advance to the “Publish” screen and scroll down to view the HTML code. If you are using an existing form, click Web Forms -> Web Forms list then click the “view source” link for the form you select.") . '</li>';
+      $output .= '<li>' . t("In the HTML code, find the URL of the Web Form and copy the WID number. It's the number that follows “WID=”.") . '</li>';
+      $output .= '<p><strong>' . t("In Drupal, enter the GetResponse WID tag.") . '</strong></p>';
+      $output .= '<li>' . t("In the “Web form ID” field, enter the WID tag you found in your GetResponse web form editor page.") . '</li>';
+      $output .= '<li>' . t("Click “Configuration”, scroll down to the Web Services section, and make sure “Comment integration” at “Subscribe via Comment” is switched ON.") . '</li>';
+      $output .= '<li>' . t("In the line below “Additional text”, choose a call-to-action sentence") . '</li>';
+      $output .= '<li>' . t("To activate the commenting function, click “Structure -> Content types”. You can either create a new content type or click “edit” at an existing one. Find the appropriate options in the lower left corner of the “Comment settings” tab. It's important that the “Anonymous commenting” pulldown menu is activated on “Anonymous posters must leave their contact 
+information”.") . '</li>';
+      $output .= '</ol>';
+      $output .= '<br />';
+      return $output;
   }
 }
 
@@ -91,7 +124,7 @@ function getresponse_admin() {
 
   $form['left']['settings'] = array(
     '#type' => 'fieldset',
-    '#title' => t('GetResponse Config'),
+    '#title' => t("GetResponse Config"),
     '#weight' => 1,
     '#collapsible' => FALSE,
     '#collapsed' => FALSE,
@@ -99,47 +132,47 @@ function getresponse_admin() {
 
   $form['left']['settings']['title1'] = array(
     '#type' => 'item',
-    '#markup' => t('<h3>Subscribe via Web Form</h3>'),
+    '#markup' => t("<h3>Subscribe via Web Form</h3>"),
   );
 
   $form['left']['settings']['getresponse_webformid'] = array(
     '#type' => 'textfield',
-    '#title' => t('Web form ID:'),
+    '#title' => t("Web form ID:"),
     '#default_value' => variable_get('getresponse_webformid', ''),
     '#size' => 0,
     '#maxlength' => 7,
-    '#description' => t('(leave empty to disable)'),
+    '#description' => t("(leave empty to disable)"),
   );
 
   $form['left']['settings']['getresponse_styleid'] = array(
     '#type' => 'select',
-    '#title' => t('Style:'),
+    '#title' => t("Style:"),
     '#default_value' => variable_get('getresponse_styleid', GETRESPONSE_STYLE_WEBFORM),
     '#options' => array(
-      '0' => t('Drupal'),
-      '1' => t('Web Form'),
+      '0' => t("Drupal"),
+      '1' => t("Web Form"),
     ),
   );
 
   $form['left']['settings']['title2'] = array(
     '#type' => 'item',
-    '#markup' => t('<br /><h3>Subscribe via Comment</h3>'),
+    '#markup' => t("<br /><h3>Subscribe via Comment</h3>"),
   );
 
   $form['left']['settings']['getresponse_comment_on'] = array(
     '#type' => 'select',
-    '#title' => t('Comment integration:'),
+    '#title' => t("Comment integration:"),
     '#default_value' => variable_get('getresponse_comment_on', 1),
     '#options' => array(
-      '1' => t('On'),
-      '0' => t('Off'),
+      '1' => t("On"),
+      '0' => t("Off"),
     ),
     '#description' => t("(allow subscriptions when visitors comment)"),
   );
 
   $form['left']['settings']['getresponse_comment_label'] = array(
     '#type' => 'textfield',
-    '#title' => t('Additional text:'),
+    '#title' => t("Additional text:"),
     '#default_value' => variable_get('getresponse_comment_label', 'Sign up to our newsletter!'),
     '#size' => 0,
     '#minlength' => 7,
@@ -147,12 +180,12 @@ function getresponse_admin() {
 
   $form['left']['settings']['my_info'] = array(
     '#type' => 'item',
-    '#markup' => t('<br /><strong>Where is my web form ID ?</strong><br />You will find your web form ID right in your GetResponse account. Go to Web Forms => Web forms list and click on the "Source" link in a selected web form. Your web form ID is the number you will see right after the "?wid=" portion of the JavaScript code. <div class="GR_img_webform_id"></div><br /><br />'),
+    '#markup' => t("<br /><strong>Where is my web form ID ?</strong><br />You will find your web form ID right in your GetResponse account. Go to Web Forms => Web forms list and click on the 'Source' link in a selected web form. Your web form ID is the number you will see right after the '?wid=' portion of the JavaScript code. <div class='GR_img_webform_id'></div><br /><br />"),
   );
 
   $form['right']['rss'] = array(
     '#type' => 'fieldset',
-    '#title' => t('GetResponse RSS'),
+    '#title' => t("GetResponse RSS"),
     '#weight' => 2,
     '#collapsible' => FALSE,
     '#collapsed' => FALSE,
@@ -167,7 +200,7 @@ function getresponse_admin() {
 
   $form['right']['social'] = array(
     '#type' => 'fieldset',
-    '#title' => t('GetResponse Social'),
+    '#title' => t("GetResponse Social"),
     '#weight' => 3,
     '#collapsible' => FALSE,
     '#collapsed' => FALSE,
@@ -202,7 +235,7 @@ function getresponse_admin() {
 function getresponse_admin_validate($form, &$form_state) {
   $webform_id = $form_state['values']['getresponse_webformid'];
   if (!is_numeric($webform_id) && !empty($webform_id)) {
-    form_set_error('getresponse_webformid', t('You must enter an integer or leave empty to disable.'));
+    form_set_error('getresponse_webformid', t("You must enter an integer or leave empty to disable."));
   }
 }
 
@@ -210,7 +243,7 @@ function getresponse_admin_validate($form, &$form_state) {
  * Implements hook_block_info().
  */
 function getresponse_block_info() {
-  $blocks['webform']['info'] = t('GetResponse WebForm');
+  $blocks['webform']['info'] = t("GetResponse WebForm");
   $blocks['webform']['cache'] = DRUPAL_NO_CACHE;
   $blocks['webform']['properties']['administrative'] = TRUE;
   return $blocks;
@@ -221,7 +254,7 @@ function getresponse_block_info() {
  */
 function getresponse_block_view($delta = '') {
   $block = array();
-  $block['content'] = '<noscript>' . t('<strong>Error:</strong><br /> You must enable JavaScript to use the GetResponse service.') . '</noscript>';
+  $block['content'] = '<noscript>' . t("Please enable JavaScript to use the GetResponse service.") . '</noscript>';
   $webform_id = variable_get('getresponse_webformid', '');
   $style_id = variable_get('getresponse_styleid', GETRESPONSE_STYLE_WEBFORM);
   if ($style_id == 0) {
