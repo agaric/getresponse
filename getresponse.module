@@ -13,19 +13,6 @@ define('GETRESPONSE_STYLE_DRUPAL', 0);
 define('GETRESPONSE_STYLE_WEBFORM', 1);
 
 /**
- * Check if user is login, return Boolean TRUE/FALSE value.
- */
-function getresponse_is_logged_in() {
-  global $user;
-  if ($user->uid == 0) {
-    return FALSE;
-  }
-  else {
-    return TRUE;
-  }
-}
-
-/**
  * Send visitor name and email to GetResponse Webform.
  *
  * @param string $name
@@ -88,7 +75,6 @@ function getresponse_help($path, $arg) {
       $output .= '<li>' . t("To activate the commenting function, click “Structure -> Content types”. You can either create a new content type or click “edit” at an existing one. Find the appropriate options in the lower left corner of the “Comment settings” tab. It's important that the “Anonymous commenting” pulldown menu is activated on “Anonymous posters must leave their contact 
 information”.") . '</li>';
       $output .= '</ol>';
-      $output .= '<br />';
       return $output;
   }
 }
@@ -98,26 +84,40 @@ information”.") . '</li>';
  */
 function getresponse_menu() {
   $items = array();
-
   $items['admin/config/services/getresponse'] = array(
-    'title' => 'GetResponse',
-    'description' => 'Configuration for GetResponse module',
+    'title' => t("GetResponse"),
+    'description' => t("Configuration for GetResponse module"),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('getresponse_admin'),
     'access arguments' => array('administer getresponse'),
     'type' => MENU_NORMAL_ITEM,
-    'file' => 'getresponse.feed.inc',);
+    'file' => 'getresponse.feed.inc',
+  );
   return $items;
 }
 
 /**
- * Implements hook_admin().
+ * Implements hook_permission().
+ */
+function getresponse_permission() {
+  return array(
+    'administer getresponse' => array(
+      'title' => t('Administer GetResponse module settings'),
+      'restrict access' => TRUE,
+    ),
+  );
+}
+
+/**
+ * GetResponse Settings Page.
  */
 function getresponse_admin() {
   $form = array();
+
   $form['left'] = array(
     '#type' => 'item',
   );
+
   $form['right'] = array(
     '#type' => 'item',
   );
@@ -173,7 +173,7 @@ function getresponse_admin() {
   $form['left']['settings']['getresponse_comment_label'] = array(
     '#type' => 'textfield',
     '#title' => t("Additional text:"),
-    '#default_value' => variable_get('getresponse_comment_label', 'Sign up to our newsletter!'),
+    '#default_value' => variable_get('getresponse_comment_label', t("Sign up to our newsletter!")),
     '#size' => 0,
     '#minlength' => 7,
   );
@@ -208,22 +208,22 @@ function getresponse_admin() {
 
   $form['right']['social']['facebook'] = array(
     '#type' => 'item',
-    '#markup' => '<a class="GR_ico sprite facebook-ico" href="http://www.facebook.com/getresponse" target="_blank" title="Facebook">Facebook</a>',
+    '#markup' => l(t("Facebook"), 'http://www.facebook.com/getresponse', array('attributes' => array('class' => array('GR_ico', 'sprite', 'facebook-ico')))),
   );
 
   $form['right']['social']['twitter'] = array(
     '#type' => 'item',
-    '#markup' => '<a class="GR_ico sprite twitter-ico" href="http://twitter.com/getresponse" target="_blank" title="Twitter">Twitter</a>',
+    '#markup' => l(t("Twitter"), 'http://twitter.com/getresponse', array('attributes' => array('class' => array('GR_ico', 'sprite', 'twitter-ico')))),
   );
 
   $form['right']['social']['linkedin'] = array(
     '#type' => 'item',
-    '#markup' => '<a class="GR_ico sprite linkedin-ico" href="http://www.linkedin.com/company/implix" target="_blank" title="LinkedIn">LinkedIn</a>',
+    '#markup' => l(t("LinkedIn"), 'http://www.linkedin.com/company/implix', array('attributes' => array('class' => array('GR_ico', 'sprite', 'linkedin-ico')))),
   );
 
   $form['right']['social']['blog'] = array(
     '#type' => 'item',
-    '#markup' => '<a class="GR_ico sprite blog-ico" href="http://blog.getresponse.com/" target="_blank" title="Blog">Blog</a>',
+    '#markup' => l(t("Blog"), 'http://blog.getresponse.com', array('attributes' => array('class' => array('GR_ico', 'sprite', 'blog-ico')))),
   );
 
   return system_settings_form($form);
@@ -243,9 +243,13 @@ function getresponse_admin_validate($form, &$form_state) {
  * Implements hook_block_info().
  */
 function getresponse_block_info() {
-  $blocks['webform']['info'] = t("GetResponse WebForm");
-  $blocks['webform']['cache'] = DRUPAL_NO_CACHE;
-  $blocks['webform']['properties']['administrative'] = TRUE;
+  $blocks = array();
+  $blocks['webform'] = array(
+    'info' => t("GetResponse WebForm"),
+    'status' => TRUE,
+    'region' => 'sidebar_first',
+    'cache' => DRUPAL_NO_CACHE,
+  );
   return $blocks;
 }
 
@@ -257,11 +261,11 @@ function getresponse_block_view($delta = '') {
   $block['content'] = '<noscript>' . t("Please enable JavaScript to use the GetResponse service.") . '</noscript>';
   $webform_id = variable_get('getresponse_webformid', '');
   $style_id = variable_get('getresponse_styleid', GETRESPONSE_STYLE_WEBFORM);
-  if ($style_id == 0) {
-    $block['content'] .= '<script type="text/javascript" src="' . GETRESPONSE_URL . '?wid=' . $webform_id . '&css=1"></script>';
-  }
-  elseif ($style_id == 1) {
+  if ($style_id == GETRESPONSE_STYLE_WEBFORM) {
     $block['content'] .= '<script type="text/javascript" src="' . GETRESPONSE_URL . '?wid=' . $webform_id . '"></script>';
+  }
+  else {
+  	$block['content'] .= '<script type="text/javascript" src="' . GETRESPONSE_URL . '?wid=' . $webform_id . '&css=1"></script>';
   }
   return $block;
 }
@@ -276,10 +280,10 @@ function getresponse_form_comment_form_alter(&$form, &$form_state, $form_id) {
   if (variable_get('comment_anonymous_' . str_replace('comment_node_', '', $form_state['comment']->node_type), COMMENT_ANONYMOUS_MAYNOT_CONTACT) == COMMENT_ANONYMOUS_MUST_CONTACT) {
     $can_enter_email = TRUE;
   }
-  if (!getresponse_is_logged_in() && $comment_on && !empty($webform_id) && $can_enter_email) {
+  if (!user_is_logged_in() && $comment_on && !empty($webform_id) && $can_enter_email) {
     $form['getresponse_comment_checkbox'] = array(
       '#type' => 'checkbox',
-      '#title' => variable_get('getresponse_comment_label', 'Sign up to our newsletter!'),
+      '#title' => variable_get('getresponse_comment_label', t("Sign up to our newsletter!")),
       '#default_value' => 0,
     );
   }
@@ -289,14 +293,13 @@ function getresponse_form_comment_form_alter(&$form, &$form_state, $form_id) {
  * Implements hook_comment_insert().
  */
 function getresponse_comment_insert($comment) {
-  if (!getresponse_is_logged_in()) {
+  if (!user_is_logged_in()) {
     $webform_id = variable_get('getresponse_webformid', '');
     $comment_on = variable_get('getresponse_comment_on', '0');
-    $comment_checkbox = $comment->getresponse_comment_checkbox;
-    if ($comment_on && !empty($webform_id) && !empty($mail) && $comment_checkbox) {
-      // First GET validate data.
+    if ($comment_on && !empty($webform_id) && !empty($comment->mail) && $comment->getresponse_comment_checkbox) {
+      // First request: GET validate data.
       getresponse_add_contact($comment->name, $comment->mail, $webform_id, 'GET');
-      // Second POST send data to GetResponse Webform.
+      // Second request: POST send data to GetResponse Webform.
       getresponse_add_contact($comment->name, $comment->mail, $webform_id, 'POST');
     }
   }
