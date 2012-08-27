@@ -85,8 +85,8 @@ information”.") . '</li>';
 function getresponse_menu() {
   $items = array();
   $items['admin/config/services/getresponse'] = array(
-    'title' => t("GetResponse"),
-    'description' => t("Configuration for GetResponse module"),
+    'title' => 'GetResponse',
+    'description' => 'Configuration for GetResponse module',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('getresponse_admin'),
     'access arguments' => array('administer getresponse'),
@@ -208,22 +208,30 @@ function getresponse_admin() {
 
   $form['right']['social']['facebook'] = array(
     '#type' => 'item',
-    '#markup' => l(t("Facebook"), 'http://www.facebook.com/getresponse', array('attributes' => array('class' => array('GR_ico', 'sprite', 'facebook-ico')))),
+    '#markup' => l(t("Facebook"), 'http://www.facebook.com/getresponse', array(
+      'attributes' => array('class' => array('GR_ico', 'sprite', 'facebook-ico'))
+    ),
   );
 
   $form['right']['social']['twitter'] = array(
     '#type' => 'item',
-    '#markup' => l(t("Twitter"), 'http://twitter.com/getresponse', array('attributes' => array('class' => array('GR_ico', 'sprite', 'twitter-ico')))),
+    '#markup' => l(t("Twitter"), 'http://twitter.com/getresponse', array(
+      'attributes' => array('class' => array('GR_ico', 'sprite', 'twitter-ico')
+    ),
   );
 
   $form['right']['social']['linkedin'] = array(
     '#type' => 'item',
-    '#markup' => l(t("LinkedIn"), 'http://www.linkedin.com/company/implix', array('attributes' => array('class' => array('GR_ico', 'sprite', 'linkedin-ico')))),
+    '#markup' => l(t("LinkedIn"), 'http://www.linkedin.com/company/implix', array(
+      'attributes' => array('class' => array('GR_ico', 'sprite', 'linkedin-ico')))
+    ),
   );
 
   $form['right']['social']['blog'] = array(
     '#type' => 'item',
-    '#markup' => l(t("Blog"), 'http://blog.getresponse.com', array('attributes' => array('class' => array('GR_ico', 'sprite', 'blog-ico')))),
+    '#markup' => l(t("Blog"), 'http://blog.getresponse.com', array(
+      'attributes' => array('class' => array('GR_ico', 'sprite', 'blog-ico')))
+    ),
   );
 
   return system_settings_form($form);
@@ -265,7 +273,7 @@ function getresponse_block_view($delta = '') {
     $block['content'] .= '<script type="text/javascript" src="' . GETRESPONSE_URL . '?wid=' . $webform_id . '"></script>';
   }
   else {
-  	$block['content'] .= '<script type="text/javascript" src="' . GETRESPONSE_URL . '?wid=' . $webform_id . '&css=1"></script>';
+    $block['content'] .= '<script type="text/javascript" src="' . GETRESPONSE_URL . '?wid=' . $webform_id . '&css=1"></script>';
   }
   return $block;
 }
