@@ -210,36 +210,36 @@ function getresponse_admin() {
     '#type' => 'item',
     '#markup' => l(t("Facebook"), 'http://www.facebook.com/getresponse', array(
       'attributes' => array(
-        'class' => array('GR_ico', 'sprite', 'facebook-ico'))
+        'class' => array('GR_ico', 'sprite', 'facebook-ico')
       )
-    ),
+    )),
   );
 
   $form['right']['social']['twitter'] = array(
     '#type' => 'item',
     '#markup' => l(t("Twitter"), 'http://twitter.com/getresponse', array(
       'attributes' => array(
-        'class' => array('GR_ico', 'sprite', 'twitter-ico'))
+        'class' => array('GR_ico', 'sprite', 'twitter-ico')
       )
-    ),
+    )),
   );
 
   $form['right']['social']['linkedin'] = array(
     '#type' => 'item',
     '#markup' => l(t("LinkedIn"), 'http://www.linkedin.com/company/implix', array(
       'attributes' => array(
-        'class' => array('GR_ico', 'sprite', 'linkedin-ico'))
+        'class' => array('GR_ico', 'sprite', 'linkedin-ico')
       )
-    ),
+    )),
   );
 
   $form['right']['social']['blog'] = array(
     '#type' => 'item',
     '#markup' => l(t("Blog"), 'http://blog.getresponse.com', array(
       'attributes' => array(
-        'class' => array('GR_ico', 'sprite', 'blog-ico'))
+        'class' => array('GR_ico', 'sprite', 'blog-ico')
       )
-    ),
+    )),
   );
 
   return system_settings_form($form);
