@@ -210,7 +210,9 @@ function getresponse_admin() {
     '#type' => 'item',
     '#markup' => l(t("Facebook"), 'http://www.facebook.com/getresponse', array(
       'attributes' => array('class' => array(
-        'GR_ico', 'sprite', 'facebook-ico'
+        'GR_ico',
+        'sprite',
+        'facebook-ico'
       )))
     ),
   );
@@ -219,7 +221,9 @@ function getresponse_admin() {
     '#type' => 'item',
     '#markup' => l(t("Twitter"), 'http://twitter.com/getresponse', array(
       'attributes' => array('class' => array(
-        'GR_ico', 'sprite', 'twitter-ico'
+        'GR_ico',
+        'sprite',
+        'twitter-ico'
       )))
     ),
   );
@@ -228,7 +232,9 @@ function getresponse_admin() {
     '#type' => 'item',
     '#markup' => l(t("LinkedIn"), 'http://www.linkedin.com/company/implix', array(
       'attributes' => array('class' => array(
-        'GR_ico', 'sprite', 'linkedin-ico'
+        'GR_ico',
+        'sprite',
+        'linkedin-ico'
       )))
     ),
   );
@@ -237,7 +243,9 @@ function getresponse_admin() {
     '#type' => 'item',
     '#markup' => l(t("Blog"), 'http://blog.getresponse.com', array(
       'attributes' => array('class' => array(
-        'GR_ico', 'sprite', 'blog-ico'
+        'GR_ico',
+        'sprite',
+        'blog-ico'
       )))
     ),
   );
