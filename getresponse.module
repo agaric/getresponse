@@ -209,14 +209,14 @@ function getresponse_admin() {
   $form['right']['social']['facebook'] = array(
     '#type' => 'item',
     '#markup' => l(t("Facebook"), 'http://www.facebook.com/getresponse', array(
-      'attributes' => array('class' => array('GR_ico', 'sprite', 'facebook-ico'))
+      'attributes' => array('class' => array('GR_ico', 'sprite', 'facebook-ico')))
     ),
   );
 
   $form['right']['social']['twitter'] = array(
     '#type' => 'item',
     '#markup' => l(t("Twitter"), 'http://twitter.com/getresponse', array(
-      'attributes' => array('class' => array('GR_ico', 'sprite', 'twitter-ico')
+      'attributes' => array('class' => array('GR_ico', 'sprite', 'twitter-ico')))
     ),
   );
 
