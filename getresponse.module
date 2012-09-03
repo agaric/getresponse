@@ -238,7 +238,7 @@ function getresponse_admin() {
     '#markup' => l(t("Blog"), 'http://blog.getresponse.com', array(
       'attributes' => array(
         'class' => array('GR_ico', 'sprite', 'blog-ico'),
-      ),`
+      ),
     )),
   );
 
