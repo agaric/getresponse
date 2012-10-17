@@ -62,11 +62,11 @@ class GetResponseRss {
         }
       }
       else {
-        $html = 'No RSS found.';
+        $html = t("No RSS found.");
       }
     }
     else {
-      $html = "Can't connect to RSS.";
+      $html = t("Can't connect to RSS.");
     }
     return $html;
   }

@@ -132,7 +132,7 @@ function getresponse_admin() {
 
   $form['left']['settings']['title1'] = array(
     '#type' => 'item',
-    '#markup' => t("<h3>Subscribe via Web Form</h3>"),
+    '#markup' => '<h3>' . t("Subscribe via Web Form") . '</h3>',
   );
 
   $form['left']['settings']['getresponse_webformid'] = array(
@@ -156,7 +156,7 @@ function getresponse_admin() {
 
   $form['left']['settings']['title2'] = array(
     '#type' => 'item',
-    '#markup' => t("<br /><h3>Subscribe via Comment</h3>"),
+    '#markup' => '<br /><h3>' . t("Subscribe via Comment") . '</h3>',
   );
 
   $form['left']['settings']['getresponse_comment_on'] = array(
@@ -180,7 +180,7 @@ function getresponse_admin() {
 
   $form['left']['settings']['my_info'] = array(
     '#type' => 'item',
-    '#markup' => t("<br /><strong>Where is my web form ID ?</strong><br />You will find your web form ID right in your GetResponse account. Go to Web Forms => Web forms list and click on the 'Source' link in a selected web form. Your web form ID is the number you will see right after the '?wid=' portion of the JavaScript code. <div class='GR_img_webform_id'></div><br /><br />"),
+    '#markup' => '<br /><strong>' . t("Where is my web form ID ?") . '</strong><br />' . t("You will find your web form ID right in your GetResponse account. Go to Web Forms => Web forms list and click on the 'Source' link in a selected web form. Your web form ID is the number you will see right after the '?wid=' portion of the JavaScript code.") . '<div class="GR_img_webform_id"></div><br /><br />',
   );
 
   $form['right']['rss'] = array(

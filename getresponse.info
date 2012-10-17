@@ -3,3 +3,5 @@ description = This plug-in/module enables installation of a GetResponse fully cu
 core = 7.x
 stylesheets[all][] = getresponse.css
 configure = admin/config/services/getresponse
+files[] = getresponse.module
+files[] = getresponse.feed.inc
