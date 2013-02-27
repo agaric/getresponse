@@ -1,4 +1,3 @@
-
 #getresponse-admin label {
   display: inline-block !important;
   width: 150px !important;
@@ -14,16 +13,16 @@
 #getresponse-admin select {
   margin-right: 9px;
 }
-#edit-left {
+#getresponse-admin #edit-left {
   float: left;
   margin-right: 30px !important;
   width: 700px;
 }
-#edit-right {
+#getresponse-admin #edit-right {
   float: left;
   width: 400px;
 }
-#edit-actions {
+#getresponse-admin #edit-actions {
   clear: left;
 }
 #edit-getresponse-webformid {
@@ -35,36 +34,36 @@
 #edit-getresponse-comment-label {
   width: 200px !important;
 }
-.GR_rss_ul {
+#getresponse-admin .GR_rss_ul {
   list-style: square;
 }
-.GR_rss_li {
+#getresponse-admin .GR_rss_li {
   margin-left: 15px;
 }
-.GR_img_webform_id {
+#getresponse-admin .GR_img_webform_id {
   background: url("webform_id.jpg") no-repeat scroll 50% 50% transparent;
   height: 317px;
   margin: 0 auto;
 }
-.sprite {
+#getresponse-admin .sprite {
   background: url("sprite.png") no-repeat scroll 0 0 transparent;
 }
-.GR_ico {
+#getresponse-admin .GR_ico {
   color: #373737;
   height: 16px;
   padding: 0 0 4px 24px;
   width: 16px;
 }
-.facebook-ico {
+#getresponse-admin .facebook-ico {
   background-position: 0 -6px;
 }
-.twitter-ico {
+#getresponse-admin .twitter-ico {
   background-position: 0 -30px;
 }
-.linkedin-ico {
+#getresponse-admin .linkedin-ico {
   background-position: 0 -54px;
 }
-.blog-ico {
+#getresponse-admin  .blog-ico {
   background-position: 0 -78px;
 }
 .block-getresponse {

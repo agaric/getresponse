@@ -49,7 +49,7 @@ class GetResponseRss {
         }
         $html = '<ul class="GR_rss_ul">';
         $count = 0;
-        if (sizeof($news_items) > 0) {
+        if (count($news_items) > 0) {
           foreach ($item_array as $item) {
             $html .= '<li class="GR_rss_li">';
             $html .= '<a href="' . check_plain($item['url']) . '" target="_blank">' . $item['title'] . '</a>';
