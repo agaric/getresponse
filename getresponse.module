@@ -250,7 +250,7 @@ function getresponse_admin() {
  */
 function getresponse_admin_validate($form, &$form_state) {
   $webform_id = $form_state['values']['getresponse_webformid'];
-  if (!is_numeric($webform_id) && !empty($webform_id)) {
+  if ((!is_numeric($webform_id) || (int)$webform_id != $webform_id || $webform_id < 0) && !empty($webform_id)) {
     form_set_error('getresponse_webformid', t("You must enter an integer or leave empty to disable."));
   }
 }
