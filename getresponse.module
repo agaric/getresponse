@@ -38,7 +38,7 @@ function getresponse_add_contact($name, $email, $webform_id, $method) {
 }
 
 /**
- * Implements hook_help().
+ * Implementation of hook_help().
  */
 function getresponse_help($path, $arg) {
   switch ($path) {
@@ -72,7 +72,7 @@ function getresponse_help($path, $arg) {
       $output .= '<li>' . t("In the “Web form ID” field, enter the WID tag you found in your GetResponse web form editor page.") . '</li>';
       $output .= '<li>' . t("Click “Configuration”, scroll down to the Web Services section, and make sure “Comment integration” at “Subscribe via Comment” is switched ON.") . '</li>';
       $output .= '<li>' . t("In the line below “Additional text”, choose a call-to-action sentence") . '</li>';
-      $output .= '<li>' . t("To activate the commenting function, click “Structure -> Content types”. You can either create a new content type or click “edit” at an existing one. Find the appropriate options in the lower left corner of the “Comment settings” tab. It's important that the “Anonymous commenting” pulldown menu is activated on “Anonymous posters must leave their contact 
+      $output .= '<li>' . t("To activate the commenting function, click “Structure -> Content types”. You can either create a new content type or click “edit” at an existing one. Find the appropriate options in the lower left corner of the “Comment settings” tab. It's important that the “Anonymous commenting” pulldown menu is activated on “Anonymous posters must leave their contact
 information”.") . '</li>';
       $output .= '</ol>';
       return $output;
@@ -97,14 +97,11 @@ function getresponse_menu() {
 }
 
 /**
- * Implements hook_permission().
+ * Implements hook_perm().
  */
-function getresponse_permission() {
+function getresponse_perm() {
   return array(
-    'administer getresponse' => array(
-      'title' => t('Administer GetResponse module settings'),
-      'restrict access' => TRUE,
-    ),
+    'administer getresponse'
   );
 }
 
@@ -113,6 +110,8 @@ function getresponse_permission() {
  */
 function getresponse_admin() {
   $form = array();
+
+  drupal_add_css(drupal_get_path('module', 'GetResponse') . '/getresponse.css');
 
   $form['left'] = array(
     '#type' => 'item',
@@ -132,7 +131,7 @@ function getresponse_admin() {
 
   $form['left']['settings']['title1'] = array(
     '#type' => 'item',
-    '#markup' => '<h3>' . t("Subscribe via Web Form") . '</h3>',
+    '#value' => '<h3>' . t("Subscribe via Web Form") . '</h3>',
   );
 
   $form['left']['settings']['getresponse_webformid'] = array(
@@ -156,7 +155,7 @@ function getresponse_admin() {
 
   $form['left']['settings']['title2'] = array(
     '#type' => 'item',
-    '#markup' => '<br /><h3>' . t("Subscribe via Comment") . '</h3>',
+    '#value' => '<br /><h3>' . t("Subscribe via Comment") . '</h3>',
   );
 
   $form['left']['settings']['getresponse_comment_on'] = array(
@@ -180,7 +179,7 @@ function getresponse_admin() {
 
   $form['left']['settings']['my_info'] = array(
     '#type' => 'item',
-    '#markup' => '<br /><strong>' . t("Where is my web form ID ?") . '</strong><br />' . t("You will find your web form ID right in your GetResponse account. Go to Web Forms => Web forms list and click on the 'Source' link in a selected web form. Your web form ID is the number you will see right after the '?wid=' portion of the JavaScript code.") . '<div class="GR_img_webform_id"></div><br /><br />',
+    '#value' => '<br /><strong>' . t("Where is my web form ID ?") . '</strong><br />' . t("You will find your web form ID right in your GetResponse account. Go to Web Forms => Web forms list and click on the 'Source' link in a selected web form. Your web form ID is the number you will see right after the '?wid=' portion of the JavaScript code.") . '<div class="GR_img_webform_id"></div><br /><br />',
   );
 
   $form['right']['rss'] = array(
@@ -195,7 +194,7 @@ function getresponse_admin() {
 
   $form['right']['rss']['content'] = array(
     '#type' => 'item',
-    '#markup' => $rss->renderRss(),
+    '#value' => $rss->renderRss(),
   );
 
   $form['right']['social'] = array(
@@ -208,36 +207,36 @@ function getresponse_admin() {
 
   $form['right']['social']['facebook'] = array(
     '#type' => 'item',
-    '#markup' => l(t("Facebook"), 'http://www.facebook.com/getresponse', array(
+    '#value' => l(t("Facebook"), 'http://www.facebook.com/getresponse', array(
       'attributes' => array(
-        'class' => array('GR_ico', 'sprite', 'facebook-ico'),
+        'class' => 'GR_ico sprite facebook-ico',
       ),
     )),
   );
 
   $form['right']['social']['twitter'] = array(
     '#type' => 'item',
-    '#markup' => l(t("Twitter"), 'http://twitter.com/getresponse', array(
+    '#value' => l(t("Twitter"), 'http://twitter.com/getresponse', array(
       'attributes' => array(
-        'class' => array('GR_ico', 'sprite', 'twitter-ico'),
+        'class' => 'GR_ico sprite twitter-ico',
       ),
     )),
   );
 
   $form['right']['social']['linkedin'] = array(
     '#type' => 'item',
-    '#markup' => l(t("LinkedIn"), 'http://www.linkedin.com/company/implix', array(
+    '#value' => l(t("LinkedIn"), 'http://www.linkedin.com/company/implix', array(
       'attributes' => array(
-        'class' => array('GR_ico', 'sprite', 'linkedin-ico'),
+        'class' => 'GR_ico sprite linkedin-ico',
       ),
     )),
   );
 
   $form['right']['social']['blog'] = array(
     '#type' => 'item',
-    '#markup' => l(t("Blog"), 'http://blog.getresponse.com', array(
+    '#value' => l(t("Blog"), 'http://blog.getresponse.com', array(
       'attributes' => array(
-        'class' => array('GR_ico', 'sprite', 'blog-ico'),
+        'class' => 'GR_ico sprite blog-ico',
       ),
     )),
   );
@@ -256,34 +255,32 @@ function getresponse_admin_validate($form, &$form_state) {
 }
 
 /**
- * Implements hook_block_info().
+ * Implements hook_block().
  */
-function getresponse_block_info() {
-  $blocks = array();
-  $blocks['webform'] = array(
-    'info' => t("GetResponse WebForm"),
-    'status' => TRUE,
-    'region' => 'sidebar_first',
-    'cache' => DRUPAL_NO_CACHE,
-  );
-  return $blocks;
-}
-
-/**
- * Implements hook_block_view().
- */
-function getresponse_block_view($delta = '') {
-  $block = array();
-  $block['content'] = '<noscript>' . t("Please enable JavaScript to use the GetResponse service.") . '</noscript>';
-  $webform_id = variable_get('getresponse_webformid', '');
-  $style_id = variable_get('getresponse_styleid', GETRESPONSE_STYLE_WEBFORM);
-  if ($style_id == GETRESPONSE_STYLE_WEBFORM) {
-    $block['content'] .= '<script type="text/javascript" src="' . GETRESPONSE_URL . '?wid=' . $webform_id . '"></script>';
-  }
-  else {
-    $block['content'] .= '<script type="text/javascript" src="' . GETRESPONSE_URL . '?wid=' . $webform_id . '&css=1"></script>';
-  }
-  return $block;
+function getresponse_block($op = 'list') {
+    if ($op == 'list') {
+        $blocks = array();
+        $blocks['webform'] = array(
+          'info' => t("GetResponse WebForm"),
+          'status' => TRUE,
+          'region' => 'left_sidebar',
+          'cache' => DRUPAL_NO_CACHE,
+        );
+        return $blocks;
+    }
+    else if ($op == 'view') {
+        $block = array();
+        $block['content'] = '<noscript>' . t("Please enable JavaScript to use the GetResponse service.") . '</noscript>';
+        $webform_id = variable_get('getresponse_webformid', '');
+        $style_id = variable_get('getresponse_styleid', GETRESPONSE_STYLE_WEBFORM);
+        if ($style_id == GETRESPONSE_STYLE_WEBFORM) {
+          $block['content'] .= '<script type="text/javascript" src="' . GETRESPONSE_URL . '?wid=' . $webform_id . '"></script>';
+        }
+        else {
+          $block['content'] .= '<script type="text/javascript" src="' . GETRESPONSE_URL . '?wid=' . $webform_id . '&css=1"></script>';
+        }
+        return $block;
+    }
 }
 
 /**
