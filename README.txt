@@ -4,8 +4,8 @@ Plugin Name: GetResponse Plugin
 Description: This plug-in/module enables installation of a GetResponse 
 fully customizable sign up form on your Drupal site. To find out more 
 about GetResponse, please visit: http://www.getresponse.com/about-us
-Version: 1.0.0
-Author: Sylwester Okrój
+Version: 2.0.0
+Author: Grzegorz Struczynski, Sylwester Okroj
 License: GPL2
 
 

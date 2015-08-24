@@ -3,39 +3,15 @@
 /**
  * @file
  * GetResponse module.
+ *
+ * @author Pawel Maslak <pawel.maslak@getresponse.com>
+ * @author Grzegorz Struczynski <grzegorz.struczynski@getresponse.com>
  */
 
-define('GETRESPONSE_URL', 'http://getresponse.com/view_webform.js');
-define('GETRESPONSE_URL_CURL', 'http://app.getresponse.com/add_contact_webform.html');
 define('GETRESPONSE_URL_FEED', 'http://blog.getresponse.com/feed');
 define('GETRESPONSE_URL_FEED_LIMIT', 10);
 define('GETRESPONSE_STYLE_DRUPAL', 0);
 define('GETRESPONSE_STYLE_WEBFORM', 1);
-
-/**
- * Send visitor name and email to GetResponse Webform.
- *
- * @param string $name
- *   real name of the visitor
- *
- * @param string $email
- *   e-mail address of the visitor
- *
- * @param string $webform_id
- *   numeric webForm id from getresponse.com
- *
- * @param string $method
- *   POST or GET
- */
-function getresponse_add_contact($name, $email, $webform_id, $method) {
-  $data = 'type=ajax&name=' . urlencode($name) . '&email=' . urlencode($email) . '&webform_id=' . $webform_id;
-  $options = array(
-    'method' => $method,
-    'data' => $data,
-    'headers' => array('Content-Type' => 'application/x-www-form-urlencoded'),
-  );
-  drupal_http_request(GETRESPONSE_URL_CURL, $options);
-}
 
 /**
  * Implements hook_help().
@@ -112,6 +88,9 @@ function getresponse_permission() {
  * GetResponse Settings Page.
  */
 function getresponse_admin() {
+
+  require_once('getresponse-api.class.php');
+
   $form = array();
 
   $form['left'] = array(
@@ -124,63 +103,133 @@ function getresponse_admin() {
 
   $form['left']['settings'] = array(
     '#type' => 'fieldset',
-    '#title' => t("GetResponse Config"),
+    '#title' => t("GetResponse Plugin Settings"),
     '#weight' => 1,
     '#collapsible' => FALSE,
     '#collapsed' => FALSE,
   );
 
-  $form['left']['settings']['title1'] = array(
-    '#type' => 'item',
-    '#markup' => '<h3>' . t("Subscribe via Web Form") . '</h3>',
-  );
-
-  $form['left']['settings']['getresponse_webformid'] = array(
+  $form['left']['settings']['getresponse_api_key'] = array(
     '#type' => 'textfield',
-    '#title' => t("Web form ID:"),
-    '#default_value' => variable_get('getresponse_webformid', ''),
-    '#size' => 0,
-    '#maxlength' => 7,
-    '#description' => t("(leave empty to disable)"),
+    '#title' => t("Api Key:"),
+    '#default_value' => variable_get('getresponse_api_key', ''),
+    '#size' => 32,
+    '#maxlength' => 32,
   );
 
-  $form['left']['settings']['getresponse_styleid'] = array(
-    '#type' => 'select',
-    '#title' => t("Style:"),
-    '#default_value' => variable_get('getresponse_styleid', GETRESPONSE_STYLE_WEBFORM),
-    '#options' => array(
-      '0' => t("Drupal"),
-      '1' => t("Web Form"),
-    ),
-  );
+  $api_key = variable_get('getresponse_api_key');
 
-  $form['left']['settings']['title2'] = array(
+  if ($api_key) {
+
+    $api = new GetResponse($api_key);
+    $campaigns = $api->getCampaigns();
+
+    $old_webform_ids = $new_webform_ids = array();
+    if (!empty($campaigns)) {
+
+      foreach ($campaigns as $v) {
+          $c[$v->campaignId] = $v->name;
+      }
+
+      $webforms = $api->getWebforms();
+
+      foreach ($webforms as $id => $webform) {
+        if ('enabled' == $webform->status) {
+          $old_webform_ids[$webform->webformId] = $webform->name . ' (' . $c[$webform->campaign->campaignId] . ')';
+        }
+      }
+
+      $webforms = $api->getForms();
+
+      foreach ($webforms as $id => $webform) {
+        if ('published' == $webform->status) {
+          $new_webform_ids[$webform->formId] = $webform->name . ' (' . $c[$webform->campaign->campaignId] . ')';
+        }
+      }
+
+    }
+
+    $form['left']['settings']['title1'] = array(
+    '#type' => 'item',
+    '#markup' => '<br /><h3>' . t("Subscribe via Web Form") . '</h3>',
+    );
+
+    if (!empty($new_webform_ids) || !empty($old_webform_ids)) {
+      $form['left']['settings']['getresponse_webformid'] = array(
+        '#type' => 'select',
+        '#title' => t("Webform:"),
+        '#default_value' => variable_get('getresponse_webformid'),
+        '#options' => array(
+          'New webforms' => $new_webform_ids,
+          'Old webforms' => $old_webform_ids,
+        )
+      );
+    }
+    else {
+      $form['left']['settings']['getresponse_webformid'] = array(
+        '#type' => 'item',
+        '#markup' => t("No Web Forms"),
+      );
+    }
+
+    $form['left']['settings']['title2'] = array(
     '#type' => 'item',
     '#markup' => '<br /><h3>' . t("Subscribe via Comment") . '</h3>',
-  );
+    );
 
-  $form['left']['settings']['getresponse_comment_on'] = array(
-    '#type' => 'select',
-    '#title' => t("Comment integration:"),
-    '#default_value' => variable_get('getresponse_comment_on', 1),
-    '#options' => array(
-      '1' => t("On"),
-      '0' => t("Off"),
-    ),
-    '#description' => t("(allow subscriptions when visitors comment)"),
-  );
+    if (!empty($campaigns)) {
+      $form['left']['settings']['getresponse_comment_on'] = array(
+      '#type' => 'select',
+      '#title' => t("Comment integration:"),
+      '#default_value' => variable_get('getresponse_comment_on', 1),
+      '#options' => array(
+        '1' => t("On"),
+        '0' => t("Off"),
+      ),
+      '#description' => t("(allow subscriptions when visitors comment)"),
+      );
+     
+      $campaign_ids = array();
+      foreach ($campaigns as $id => $campaign) {
+        $campaign_ids[$campaign->campaignId] = $campaign->name;
+      }
+     
+      $form['left']['settings']['getresponse_comment_campaign'] = array(
+      '#type' => 'select',
+      '#title' => t("Target campaign:"),
+      '#default_value' => variable_get('getresponse_comment_campaign', ''),
+      '#options' => $campaign_ids,
+      );
+     
+      $form['left']['settings']['getresponse_comment_label'] = array(
+      '#type' => 'textfield',
+      '#title' => t("Additional text:"),
+      '#default_value' => variable_get('getresponse_comment_label', t("Sign up to our newsletter!")),
+      '#size' => 0,
+      '#minlength' => 7,
+      );
+     
+      $form['left']['settings']['comment_info'] = array(
+        '#type' => 'item',
+        '#markup' => '<br /><strong>' . t("How to allow anonymous comments?") . '</strong><br />' . t("Make sure you have both the 'access comments' and 'post comments' permissions enabled for anonymous users. Can be found: People -> Permissions -> Comments") . '<br />',
+      );
+        
+      $form['left']['settings']['email_info'] = array(
+        '#type' => 'item',
+        '#markup' => '<br /><strong>' . t("How to add email field to comments?") . '</strong><br />' . t("Structure -> Content type -> content (e.g Article) -> edit -> Comment settings -> Anonymous commenting: -> Anonymous posters must leave their contact information") . '<br />',
+      );
+    }
+    else {
+      $form['left']['settings']['no_campaigns'] = array(
+        '#type' => 'item',
+        '#markup' => t("No Campaigns"),
+      );
+    }
+  }
 
-  $form['left']['settings']['getresponse_comment_label'] = array(
-    '#type' => 'textfield',
-    '#title' => t("Additional text:"),
-    '#default_value' => variable_get('getresponse_comment_label', t("Sign up to our newsletter!")),
-    '#size' => 0,
-    '#minlength' => 7,
-  );
-
-  $form['left']['settings']['my_info'] = array(
+  $form['left']['settings']['api_info'] = array(
     '#type' => 'item',
-    '#markup' => '<br /><strong>' . t("Where is my web form ID ?") . '</strong><br />' . t("You will find your web form ID right in your GetResponse account. Go to Web Forms => Web forms list and click on the 'Source' link in a selected web form. Your web form ID is the number you will see right after the '?wid=' portion of the JavaScript code.") . '<div class="GR_img_webform_id"></div><br /><br />',
+    '#markup' => '<br /><strong>' . t("Where can I find API Key?") . '</strong><br />' . t("You can find it on your GetResponse profile in Account Details -> GetResponse API") . '</div>',
   );
 
   $form['right']['rss'] = array(
@@ -249,9 +298,48 @@ function getresponse_admin() {
  * Implements hook_admin_validate().
  */
 function getresponse_admin_validate($form, &$form_state) {
-  $webform_id = $form_state['values']['getresponse_webformid'];
-  if ((!is_numeric($webform_id) || (int)$webform_id != $webform_id || $webform_id < 0) && !empty($webform_id)) {
-    form_set_error('getresponse_webformid', t("You must enter an integer or leave empty to disable."));
+
+  if (isset($form_state['values']['getresponse_api_key']) && empty($form_state['values']['getresponse_api_key'])) {
+    form_set_error('getresponse_api_key', t("API key can not be empty"));
+  }
+  else
+  {
+    $apikey = $form_state['values']['getresponse_api_key'];
+    $api = new GetResponse($apikey);
+    $webform = null;
+
+    $ping = $api->ping();
+
+    if ( isset($ping->code)) {
+      variable_del('getresponse_api_key');
+      unset($form_state['values']['getresponse_api_key']);
+      form_set_error('getresponse_api_key', t("Invalid API key"));
+    }
+    else {
+      variable_set('getresponse_api_key', $apikey);
+
+      if (isset($form_state['values']['getresponse_webformid'])) {
+
+        if (isset($form_state['values']['getresponse_comment_campaign'])) {
+          variable_set('getresponse_comment_campaign', $form_state['values']['getresponse_comment_campaign']);
+        }
+
+        $webform_id = $form_state['values']['getresponse_webformid'];
+
+        $webform = $api->getForm($webform_id);
+
+        if (!isset($webform->formId)) {
+            $webform = $api->getWebform($webform_id);
+        }
+      }
+
+      if ($webform && !empty($webform->scriptUrl)) {
+        variable_set('getresponse_webformurl', $webform->scriptUrl);
+      }
+      else {
+        variable_del('getresponse_webformurl');
+      }
+    }
   }
 }
 
@@ -275,14 +363,8 @@ function getresponse_block_info() {
 function getresponse_block_view($delta = '') {
   $block = array();
   $block['content'] = '<noscript>' . t("Please enable JavaScript to use the GetResponse service.") . '</noscript>';
-  $webform_id = variable_get('getresponse_webformid', '');
-  $style_id = variable_get('getresponse_styleid', GETRESPONSE_STYLE_WEBFORM);
-  if ($style_id == GETRESPONSE_STYLE_WEBFORM) {
-    $block['content'] .= '<script type="text/javascript" src="' . GETRESPONSE_URL . '?wid=' . $webform_id . '"></script>';
-  }
-  else {
-    $block['content'] .= '<script type="text/javascript" src="' . GETRESPONSE_URL . '?wid=' . $webform_id . '&css=1"></script>';
-  }
+  $webform_url = variable_get('getresponse_webformurl', '');
+  $block['content'] .= '<script type="text/javascript" src="' . $webform_url . '"></script>';
   return $block;
 }
 
@@ -290,13 +372,13 @@ function getresponse_block_view($delta = '') {
  * Implements hook_form_comment_form_alter().
  */
 function getresponse_form_comment_form_alter(&$form, &$form_state, $form_id) {
-  $webform_id = variable_get('getresponse_webformid', '');
+  $webform_url = variable_get('getresponse_webformurl', '');
   $comment_on = variable_get('getresponse_comment_on', '0');
   $can_enter_email = FALSE;
   if (variable_get('comment_anonymous_' . str_replace('comment_node_', '', $form_state['comment']->node_type), COMMENT_ANONYMOUS_MAYNOT_CONTACT) == COMMENT_ANONYMOUS_MUST_CONTACT) {
     $can_enter_email = TRUE;
   }
-  if (!user_is_logged_in() && $comment_on && !empty($webform_id) && $can_enter_email) {
+  if (!user_is_logged_in() && $comment_on && !empty($webform_url) && $can_enter_email) {
     $form['getresponse_comment_checkbox'] = array(
       '#type' => 'checkbox',
       '#title' => variable_get('getresponse_comment_label', t("Sign up to our newsletter!")),
@@ -310,13 +392,20 @@ function getresponse_form_comment_form_alter(&$form, &$form_state, $form_id) {
  */
 function getresponse_comment_insert($comment) {
   if (!user_is_logged_in()) {
-    $webform_id = variable_get('getresponse_webformid', '');
+    $api_key = variable_get('getresponse_api_key', '');
+    $campaign_id = variable_get('getresponse_comment_campaign', '');
     $comment_on = variable_get('getresponse_comment_on', '0');
-    if ($comment_on && !empty($webform_id) && !empty($comment->mail) && $comment->getresponse_comment_checkbox) {
-      // First request: GET validate data.
-      getresponse_add_contact($comment->name, $comment->mail, $webform_id, 'GET');
-      // Second request: POST send data to GetResponse Webform.
-      getresponse_add_contact($comment->name, $comment->mail, $webform_id, 'POST');
+    if ($api_key && $campaign_id && $comment_on && !empty($comment->mail) && $comment->getresponse_comment_checkbox) {
+      require_once('getresponse-api.class.php');
+      $api = new GetResponse($api_key);
+
+      $api->addContact(array(
+        'name' => $comment->name,
+        'email' => $comment->mail,
+        'campaign' => array(
+          'campaignId' => $campaign_id
+        )
+      ));
     }
   }
 }

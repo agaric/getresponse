@@ -8,6 +8,7 @@
 #getresponse-admin .form-item {
   margin: 3px;
   padding: 0;
+  margin-bottom: 10px;
 }
 #getresponse-admin input,
 #getresponse-admin select {
@@ -26,13 +27,19 @@
   clear: left;
 }
 #edit-getresponse-webformid {
-  width: 120px !important;
+  width: 220px !important;
+}
+#edit-getresponse-comment-on {
+  width: 126px !important;
+}
+#edit-getresponse-comment-campaign {
+  width: 220px !important;
 }
 #edit-getresponse-styleid {
   width: 126px !important;
 }
 #edit-getresponse-comment-label {
-  width: 200px !important;
+  width: 210px !important;
 }
 #getresponse-admin .GR_rss_ul {
   list-style: square;
@@ -66,7 +73,10 @@
 #getresponse-admin  .blog-ico {
   background-position: 0 -78px;
 }
-.block-getresponse {
+#getresponse-admin .block-getresponse {
   border: 0 !important;
   padding: 0 !important;
+}
+#getresponse-admin .form-text, .form-select {
+  font-size: 14px;
 }

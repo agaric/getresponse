@@ -66,7 +66,7 @@ class GetResponseRss {
       }
     }
     else {
-      $html = t("Can't connect to RSS.");
+      $html = t("Unable to find RSS feed");
     }
     return $html;
   }
