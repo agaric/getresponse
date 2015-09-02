@@ -14,4 +14,7 @@ function getresponse_uninstall() {
   variable_del('getresponse_comment_label');
   variable_del('getresponse_webformurl');
   variable_del('getresponse_comment_campaign');
+  variable_del('getresponse_register_user');
+  variable_del('getresponse_register_label');
+  variable_del('getresponse_register_campaign');
 }
