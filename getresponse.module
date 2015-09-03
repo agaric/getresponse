@@ -430,7 +430,7 @@ function getresponse_comment_insert($comment) {
     $api_key = variable_get('getresponse_api_key', '');
     $campaign_id = variable_get('getresponse_comment_campaign', '');
     $comment_on = variable_get('getresponse_comment_on', '0');
-    if ($api_key && $campaign_id && $comment_on && !empty($comment->mail) && $comment->getresponse_comment_checkbox) {
+    if ($api_key && $campaign_id && $comment_on && !empty($comment->mail) && isset($comment->getresponse_comment_checkbox)) {
       require_once('getresponse-api.class.php');
       $api = new GetResponse($api_key);
 
