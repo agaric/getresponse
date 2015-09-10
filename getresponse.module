@@ -25,11 +25,12 @@ function getresponse_help($path, $arg) {
       $output .= '<br/>' . t("To find out more about GetResponse, please visit: <a href='http://www.getresponse.com/about-us'>http://www.getresponse.com/about-us</a>") . '</p>';
       $output .= '<h2>' . t("To install the plug-in, follow the guidelines below:") . '</h3>';
       $output .= '<ol>';
+      $output .= '<li>' . t("Install the GetResponse plug-in in your Drupal account by using the zip file.") . '</li>';
       $output .= '<li>' . t("Create a new web form in you GetResponse account.") . '</li>';
       $output .= '<li>' . t("Log in to Drupal and find plug-in setings.") . '</li>';
       $output .= '<li>' . t("Type in API key. Learn how to find API Key here: <a href='http://support.getresponse.com/faq/where-i-find-api-key'>http://support.getresponse.com/faq/where-i-find-api-key</a>") . '</li>';
       $output .= '<li>' . t("Set sign-up details in Plug-in Settings widow") . '</li>';
-      $output .= '<li>' . t("Last but not least, decide where the GetResponse web form should appear on your website. Click “Structure -> Blocks”, scroll down to the “Disabled” section and locate the pulldown menu beside the GetResponse WebForm plugin. Click to select the position where the web form should be shown. ") . '</li>';
+      $output .= '<li>' . t("Last but not least, decide where the GetResponse web form should appear on your website. Click “Structure -> Blocks”, scroll down to the “Disabled” section and locate the pulldown menu beside the GetResponse WebForm plugin. Click to select the position where the web form should be shown.") . '</li>';
       $output .= '</ol>';
       $output .= '<p></p>';
       $output .= '<h3>' . t("To enable blog readers to subscribe to your GetResponse campaigns via blog comments, follow these instructions:") . '</h3>';
@@ -100,7 +101,7 @@ function getresponse_admin() {
 
   $form['left']['settings']['getresponse_api_key'] = array(
     '#type' => 'textfield',
-    '#title' => t("Api Key:"),
+    '#title' => t("Api Key"),
     '#default_value' => variable_get('getresponse_api_key', ''),
     '#size' => 32,
     '#maxlength' => 32,
@@ -146,7 +147,7 @@ function getresponse_admin() {
     if (!empty($new_webform_ids) || !empty($old_webform_ids)) {
       $form['left']['settings']['getresponse_webformid'] = array(
         '#type' => 'select',
-        '#title' => t("Webform:"),
+        '#title' => t("Webform"),
         '#default_value' => variable_get('getresponse_webformid'),
         '#options' => array(
           'New webforms' => $new_webform_ids,
@@ -169,7 +170,7 @@ function getresponse_admin() {
     if (!empty($campaigns)) {
       $form['left']['settings']['getresponse_comment_on'] = array(
       '#type' => 'select',
-      '#title' => t("Comment integration:"),
+      '#title' => t("Comment integration"),
       '#default_value' => variable_get('getresponse_comment_on', 1),
       '#options' => array(
         '1' => t("On"),
@@ -180,7 +181,7 @@ function getresponse_admin() {
 
       $form['left']['settings']['getresponse_comment_label'] = array(
       '#type' => 'textfield',
-      '#title' => t("Additional text:"),
+      '#title' => t("Additional text"),
       '#default_value' => variable_get('getresponse_comment_label', t("Sign up to our newsletter!")),
       '#size' => 0,
       '#minlength' => 7,
@@ -194,7 +195,7 @@ function getresponse_admin() {
 
       $form['left']['settings']['getresponse_comment_campaign'] = array(
       '#type' => 'select',
-      '#title' => t("Target campaign:"),
+      '#title' => t("Target campaign"),
       '#default_value' => variable_get('getresponse_comment_campaign', ''),
       '#options' => $campaign_ids,
       );
@@ -206,7 +207,7 @@ function getresponse_admin() {
 
       $form['left']['settings']['getresponse_register_user'] = array(
       '#type' => 'select',
-      '#title' => t("Register integration:"),
+      '#title' => t("Register integration"),
       '#default_value' => variable_get('getresponse_register_user', 1),
       '#options' => array(
         '1' => t("On"),
@@ -217,7 +218,7 @@ function getresponse_admin() {
 
       $form['left']['settings']['getresponse_register_label'] = array(
       '#type' => 'textfield',
-      '#title' => t("Additional text:"),
+      '#title' => t("Additional text"),
       '#default_value' => variable_get('getresponse_register_label', t("Sign up to our newsletter!")),
       '#size' => 0,
       '#minlength' => 7,
@@ -226,19 +227,19 @@ function getresponse_admin() {
 
       $form['left']['settings']['getresponse_register_campaign'] = array(
       '#type' => 'select',
-      '#title' => t("Target campaign:"),
+      '#title' => t("Target campaign"),
       '#default_value' => variable_get('getresponse_register_campaign', ''),
       '#options' => $campaign_ids,
       );
 
       $form['left']['settings']['comment_info'] = array(
         '#type' => 'item',
-        '#markup' => '<br /><strong>' . t("How to allow anonymous comments?") . '</strong><br />' . t("Make sure you have both the 'access comments' and 'post comments' permissions enabled for anonymous users. Can be found: People -> Permissions -> Comments") . '<br />',
+        '#markup' => '<br /><strong>' . t("How to allow anonymous comments?") . '</strong><br />' . t("Make sure you have both the 'access comments' and 'post comments' permissions enabled for anonymous users. Can be found: People -> Permissions -> Comments.") . '<br />',
       );
         
       $form['left']['settings']['email_info'] = array(
         '#type' => 'item',
-        '#markup' => '<br /><strong>' . t("How to add email field to comments?") . '</strong><br />' . t("Structure -> Content type -> content (e.g Article) -> edit -> Comment settings -> Anonymous commenting: -> Anonymous posters must leave their contact information") . '<br />',
+        '#markup' => '<br /><strong>' . t("How to add email field to comments?") . '</strong><br />' . t("Structure -> Content type -> content (e.g Article) -> edit -> Comment settings -> Anonymous commenting: -> Anonymous posters must leave their contact information.") . '<br />',
       );
 
       $form['left']['settings']['register_info'] = array(
@@ -256,7 +257,7 @@ function getresponse_admin() {
 
   $form['left']['settings']['api_info'] = array(
     '#type' => 'item',
-    '#markup' => '<br /><strong>' . t("Where can I find API Key?") . '</strong><br />' . t("You can find it on your GetResponse profile in Account Details -> GetResponse API") . '</div>',
+    '#markup' => '<br /><strong>' . t("Where can I find API Key?") . '</strong><br />' . t("You can find it on your GetResponse profile, learn how to find API Key here: <a href='http://support.getresponse.com/faq/where-i-find-api-key'>http://support.getresponse.com/faq/where-i-find-api-key</a>.") . '</div>',
   );
 
   $form['right']['rss'] = array(
@@ -454,7 +455,7 @@ function getresponse_form_user_register_form_alter(&$form, &$form_state) {
   $api_key = variable_get('getresponse_api_key', '');
   $campaign_id = variable_get('getresponse_register_campaign', '');
 
-  if (!empty($form_state['input']['mail']) and !empty($api_key) and isset($form_state['input']['getresponse_comment_checkbox']) and $form_state['input']['getresponse_comment_checkbox'] == '1') {
+  if (!empty($form_state['input']['mail']) && !empty($api_key) && isset($form_state['input']['getresponse_comment_checkbox']) && $form_state['input']['getresponse_comment_checkbox'] == '1') {
 
     require_once('getresponse-api.class.php');
     $api = new GetResponse($api_key);

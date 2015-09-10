@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Class dealing with GetResponse rss
+ *
  * @file
  * GetResponseRSS Class.
  */
@@ -70,4 +72,5 @@ class GetResponseRss {
     }
     return $html;
   }
+
 }

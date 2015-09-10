@@ -47,11 +47,6 @@
 #getresponse-admin .GR_rss_li {
   margin-left: 15px;
 }
-#getresponse-admin .GR_img_webform_id {
-  background: url("webform_id.jpg") no-repeat scroll 50% 50% transparent;
-  height: 317px;
-  margin: 0 auto;
-}
 #getresponse-admin .sprite {
   background: url("sprite.png") no-repeat scroll 0 0 transparent;
 }
