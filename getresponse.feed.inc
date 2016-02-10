@@ -1,8 +1,6 @@
 <?php
 
 /**
- * Class dealing with GetResponse rss
- *
  * @file
  * GetResponseRSS Class.
  */
@@ -36,7 +34,7 @@ class GetResponseRss {
   /**
    * Function return RSS data as html string.
    */
-  public function renderRss() {
+  public function renderRss($limit = 5) {
     $result = drupal_http_request(GETRESPONSE_URL_FEED);
     if (!isset($result->error)) {
       $news_items = $this->parseXMLdata('item', $result->data, FALSE, TRUE);
@@ -56,7 +54,7 @@ class GetResponseRss {
             $html .= '<li class="GR_rss_li">';
             $html .= '<a href="' . check_plain($item['url']) . '" target="_blank">' . $item['title'] . '</a>';
             $html .= '</li>';
-            if (++$count == GETRESPONSE_URL_FEED_LIMIT) {
+            if (++$count == $limit) {
               break;
             }
           }
@@ -72,5 +70,4 @@ class GetResponseRss {
     }
     return $html;
   }
-
 }
