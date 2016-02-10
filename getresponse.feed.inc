@@ -11,6 +11,12 @@ class GetResponseRss {
 
   /**
    * Functions parse XML data, return string|FALSE.
+   *
+   * @param $element_name
+   * @param $xml
+   * @param bool|TRUE $content_only
+   * @param bool|FALSE $match_all
+   * @return bool
    */
   protected function parseXMLdata($element_name, $xml, $content_only = TRUE, $match_all = FALSE) {
     if ($xml == FALSE) {
@@ -35,8 +41,12 @@ class GetResponseRss {
 
   /**
    * Function return RSS data as html string.
+   *
+   * @param int $limit
+   * @return string
    */
-  public function renderRss() {
+  public function renderRss($limit = 5) {
+    $item_array = array();
     $result = drupal_http_request(GETRESPONSE_URL_FEED);
     if (!isset($result->error)) {
       $news_items = $this->parseXMLdata('item', $result->data, FALSE, TRUE);
@@ -56,7 +66,7 @@ class GetResponseRss {
             $html .= '<li class="GR_rss_li">';
             $html .= '<a href="' . check_plain($item['url']) . '" target="_blank">' . $item['title'] . '</a>';
             $html .= '</li>';
-            if (++$count == GETRESPONSE_URL_FEED_LIMIT) {
+            if (++$count == $limit) {
               break;
             }
           }
