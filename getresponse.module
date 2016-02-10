@@ -1,487 +1,71 @@
 <?php
 
 /**
- * @file
- * GetResponse module.
- *
- * @author Pawel Maslak <pawel.maslak@getresponse.com>
- * @author Grzegorz Struczynski <grzegorz.struczynski@getresponse.com>
- */
-
-define('GETRESPONSE_URL_FEED', 'http://blog.getresponse.com/feed');
-define('GETRESPONSE_URL_FEED_LIMIT', 10);
-define('GETRESPONSE_STYLE_DRUPAL', 0);
-define('GETRESPONSE_STYLE_WEBFORM', 1);
-
-/**
- * Implements hook_help().
- */
-function getresponse_help($path, $arg) {
-  switch ($path) {
-    case 'admin/help#getresponse':
-      $output = '';
-      $output .= '<h3>' . t("About") . '</h3>';
-      $output .= '<p>' . t("Create highly targeted lists captured from among visitors to your Drupal site and blog. Simply create a web form matched to your brand and install it on your site in a few simple steps. With the new GetResponse-Drupal plug-in, it’s automatic. The plug-in enables your visitors to subscribe via a sign-up form as well as via comment. All you need to do is add an invitation line that will be displayed in the comment form, and their email address will be added to your GetResponse list automatically.");
-      $output .= '<br/>' . t("To find out more about GetResponse, please visit: <a href='http://www.getresponse.com/about-us'>http://www.getresponse.com/about-us</a>") . '</p>';
-      $output .= '<h2>' . t("To install the plug-in, follow the guidelines below:") . '</h3>';
-      $output .= '<ol>';
-      $output .= '<li>' . t("Install the GetResponse plug-in in your Drupal account by using the zip file.") . '</li>';
-      $output .= '<li>' . t("Create a new web form in you GetResponse account.") . '</li>';
-      $output .= '<li>' . t("Log in to Drupal and find plug-in setings.") . '</li>';
-      $output .= '<li>' . t("Type in API key. Learn how to find API Key here: <a href='http://support.getresponse.com/faq/where-i-find-api-key'>http://support.getresponse.com/faq/where-i-find-api-key</a>") . '</li>';
-      $output .= '<li>' . t("Set sign-up details in Plug-in Settings widow") . '</li>';
-      $output .= '<li>' . t("Last but not least, decide where the GetResponse web form should appear on your website. Click “Structure -> Blocks”, scroll down to the “Disabled” section and locate the pulldown menu beside the GetResponse WebForm plugin. Click to select the position where the web form should be shown.") . '</li>';
-      $output .= '</ol>';
-      $output .= '<p></p>';
-      $output .= '<h3>' . t("To enable blog readers to subscribe to your GetResponse campaigns via blog comments, follow these instructions:") . '</h3>';
-      $output .= "<p>Structure -> Content type -> content (e.g Article) -> edit -> Comment settings -> Anonymous commenting: -> Anonymous posters must leave their contact information.</p>";
-      $output .= '<p></p>';
-      $output .= '<h3>' . t("How to allow anonymous comments?") . '</h3>';
-      $output .= "<p>Make sure you have both the 'access comments' and 'post comments' permissions enabled for anonymous users. Can be found: People -> Permissions -> Comments.</p>";
-      $output .= '<p></p>';
-      $output .= '<h3>' . t("How enable visitors to register accounts?") . '</h3>';
-      $output .= "<p>Administration -> Configuration -> People -> Account settings, in section Registration and cancellation option 'Visitors' or 'Visitors, but administrator approval is required' should be checked.</p>";
-      return $output;
-  }
-}
-
-/**
  * Implements hook_menu().
  */
 function getresponse_menu() {
-  $items = array();
-  $items['admin/config/services/getresponse'] = array(
+  $items['getresponse'] = array(
     'title' => 'GetResponse',
-    'description' => 'Configuration for GetResponse module',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('getresponse_admin'),
-    'access arguments' => array('administer getresponse'),
-    'type' => MENU_NORMAL_ITEM,
-    'file' => 'getresponse.feed.inc',
+    'route_name' => 'getresponse.settings_form',
+  );
+  $items['getresponse/config'] = array(
+    'title' => 'Getresponse Configuration',
+    'route_name' => 'getresponse.settings_form',
   );
   return $items;
 }
 
 /**
- * Implements hook_permission().
- */
-function getresponse_permission() {
-  return array(
-    'administer getresponse' => array(
-      'title' => t('Administer GetResponse module settings'),
-      'restrict access' => TRUE,
-    ),
-  );
-}
-
-/**
- * GetResponse Settings Page.
- */
-function getresponse_admin() {
-
-  require_once('getresponse-api.class.php');
-
-  $form = array();
-
-  $form['left'] = array(
-    '#type' => 'item',
-  );
-
-  $form['right'] = array(
-    '#type' => 'item',
-  );
-
-  $form['left']['settings'] = array(
-    '#type' => 'fieldset',
-    '#title' => t("GetResponse Plugin Settings"),
-    '#weight' => 1,
-    '#collapsible' => FALSE,
-    '#collapsed' => FALSE,
-  );
-
-  $form['left']['settings']['getresponse_api_key'] = array(
-    '#type' => 'textfield',
-    '#title' => t("Api Key"),
-    '#default_value' => variable_get('getresponse_api_key', ''),
-    '#size' => 32,
-    '#maxlength' => 32,
-  );
-
-  $api_key = variable_get('getresponse_api_key');
-
-  if ($api_key) {
-
-    $api = new GetResponse($api_key);
-    $campaigns = $api->getCampaigns();
-
-    $old_webform_ids = $new_webform_ids = array();
-    if (!empty($campaigns)) {
-
-      foreach ($campaigns as $v) {
-          $c[$v->campaignId] = $v->name;
-      }
-
-      $webforms = $api->getWebforms();
-
-      foreach ($webforms as $id => $webform) {
-        if ('enabled' == $webform->status) {
-          $old_webform_ids[$webform->webformId] = $webform->name . ' (' . $c[$webform->campaign->campaignId] . ')';
-        }
-      }
-
-      $webforms = $api->getForms();
-
-      foreach ($webforms as $id => $webform) {
-        if ('published' == $webform->status) {
-          $new_webform_ids[$webform->formId] = $webform->name . ' (' . $c[$webform->campaign->campaignId] . ')';
-        }
-      }
-
-    }
-
-    $form['left']['settings']['title1'] = array(
-    '#type' => 'item',
-    '#markup' => '<br /><h3>' . t("Subscribe via Web Form") . '</h3>',
-    );
-
-    if (!empty($new_webform_ids) || !empty($old_webform_ids)) {
-      $form['left']['settings']['getresponse_webformid'] = array(
-        '#type' => 'select',
-        '#title' => t("Webform"),
-        '#default_value' => variable_get('getresponse_webformid'),
-        '#options' => array(
-          'New webforms' => $new_webform_ids,
-          'Old webforms' => $old_webform_ids,
-        )
-      );
-    }
-    else {
-      $form['left']['settings']['getresponse_webformid'] = array(
-        '#type' => 'item',
-        '#markup' => t("No Web Forms"),
-      );
-    }
-
-    $form['left']['settings']['title2'] = array(
-    '#type' => 'item',
-    '#markup' => '<br /><h3>' . t("Subscribe via Comment") . '</h3>',
-    );
-
-    if (!empty($campaigns)) {
-      $form['left']['settings']['getresponse_comment_on'] = array(
-      '#type' => 'select',
-      '#title' => t("Comment integration"),
-      '#default_value' => variable_get('getresponse_comment_on', 1),
-      '#options' => array(
-        '1' => t("On"),
-        '0' => t("Off"),
-      ),
-      '#description' => t("(allow subscriptions when visitors comment)"),
-      );
-
-      $form['left']['settings']['getresponse_comment_label'] = array(
-      '#type' => 'textfield',
-      '#title' => t("Additional text"),
-      '#default_value' => variable_get('getresponse_comment_label', t("Sign up to our newsletter!")),
-      '#size' => 0,
-      '#minlength' => 7,
-      '#description' => t("(for visitors comment)"),
-      );
-
-      $campaign_ids = array();
-      foreach ($campaigns as $id => $campaign) {
-        $campaign_ids[$campaign->campaignId] = $campaign->name;
-      }
-
-      $form['left']['settings']['getresponse_comment_campaign'] = array(
-      '#type' => 'select',
-      '#title' => t("Target campaign"),
-      '#default_value' => variable_get('getresponse_comment_campaign', ''),
-      '#options' => $campaign_ids,
-      );
-
-      $form['left']['settings']['title3'] = array(
-      '#type' => 'item',
-      '#markup' => '<br /><h3>' . t("Subscribe via Registration Form") . '</h3>',
-      );
-
-      $form['left']['settings']['getresponse_register_user'] = array(
-      '#type' => 'select',
-      '#title' => t("Register integration"),
-      '#default_value' => variable_get('getresponse_register_user', 1),
-      '#options' => array(
-        '1' => t("On"),
-        '0' => t("Off"),
-      ),
-      '#description' => t("(allow subscriptions when visitors create new account)"),
-      );
-
-      $form['left']['settings']['getresponse_register_label'] = array(
-      '#type' => 'textfield',
-      '#title' => t("Additional text"),
-      '#default_value' => variable_get('getresponse_register_label', t("Sign up to our newsletter!")),
-      '#size' => 0,
-      '#minlength' => 7,
-      '#description' => t("(for account creators)"),
-      );
-
-      $form['left']['settings']['getresponse_register_campaign'] = array(
-      '#type' => 'select',
-      '#title' => t("Target campaign"),
-      '#default_value' => variable_get('getresponse_register_campaign', ''),
-      '#options' => $campaign_ids,
-      );
-
-      $form['left']['settings']['comment_info'] = array(
-        '#type' => 'item',
-        '#markup' => '<br /><strong>' . t("How to allow anonymous comments?") . '</strong><br />' . t("Make sure you have both the 'access comments' and 'post comments' permissions enabled for anonymous users. Can be found: People -> Permissions -> Comments.") . '<br />',
-      );
-        
-      $form['left']['settings']['email_info'] = array(
-        '#type' => 'item',
-        '#markup' => '<br /><strong>' . t("How to add email field to comments?") . '</strong><br />' . t("Structure -> Content type -> content (e.g Article) -> edit -> Comment settings -> Anonymous commenting: -> Anonymous posters must leave their contact information.") . '<br />',
-      );
-
-      $form['left']['settings']['register_info'] = array(
-        '#type' => 'item',
-        '#markup' => '<br /><strong>' . t("How enable visitors to register accounts?") . '</strong><br />' . t("Administration -> Configuration -> People -> Account settings, in section Registration and cancellation option 'Visitors' or 'Visitors, but administrator approval is required' should be checked.") . '<br />',
-      );
-    }
-    else {
-      $form['left']['settings']['no_campaigns'] = array(
-        '#type' => 'item',
-        '#markup' => t("No Campaigns"),
-      );
-    }
-  }
-
-  $form['left']['settings']['api_info'] = array(
-    '#type' => 'item',
-    '#markup' => '<br /><strong>' . t("Where can I find API Key?") . '</strong><br />' . t("You can find it on your GetResponse profile, learn how to find API Key here: <a href='http://support.getresponse.com/faq/where-i-find-api-key'>http://support.getresponse.com/faq/where-i-find-api-key</a>.") . '</div>',
-  );
-
-  $form['right']['rss'] = array(
-    '#type' => 'fieldset',
-    '#title' => t("GetResponse RSS"),
-    '#weight' => 2,
-    '#collapsible' => FALSE,
-    '#collapsed' => FALSE,
-  );
-
-  $rss = new GetResponseRss();
-
-  $form['right']['rss']['content'] = array(
-    '#type' => 'item',
-    '#markup' => $rss->renderRss(),
-  );
-
-  $form['right']['social'] = array(
-    '#type' => 'fieldset',
-    '#title' => t("GetResponse Social"),
-    '#weight' => 3,
-    '#collapsible' => FALSE,
-    '#collapsed' => FALSE,
-  );
-
-  $form['right']['social']['facebook'] = array(
-    '#type' => 'item',
-    '#markup' => l(t("Facebook"), 'http://www.facebook.com/getresponse', array(
-      'attributes' => array(
-        'class' => array('GR_ico', 'sprite', 'facebook-ico'),
-      ),
-    )),
-  );
-
-  $form['right']['social']['twitter'] = array(
-    '#type' => 'item',
-    '#markup' => l(t("Twitter"), 'http://twitter.com/getresponse', array(
-      'attributes' => array(
-        'class' => array('GR_ico', 'sprite', 'twitter-ico'),
-      ),
-    )),
-  );
-
-  $form['right']['social']['linkedin'] = array(
-    '#type' => 'item',
-    '#markup' => l(t("LinkedIn"), 'https://www.linkedin.com/company/getresponse', array(
-      'attributes' => array(
-        'class' => array('GR_ico', 'sprite', 'linkedin-ico'),
-      ),
-    )),
-  );
-
-  $form['right']['social']['blog'] = array(
-    '#type' => 'item',
-    '#markup' => l(t("Blog"), 'http://blog.getresponse.com', array(
-      'attributes' => array(
-        'class' => array('GR_ico', 'sprite', 'blog-ico'),
-      ),
-    )),
-  );
-
-  return system_settings_form($form);
-}
-
-/**
- * Implements hook_admin_validate().
- */
-function getresponse_admin_validate($form, &$form_state) {
-
-  if (isset($form_state['values']['getresponse_api_key']) && empty($form_state['values']['getresponse_api_key'])) {
-    form_set_error('getresponse_api_key', t("API key can not be empty"));
-  }
-  else
-  {
-    $apikey = $form_state['values']['getresponse_api_key'];
-    $api = new GetResponse($apikey);
-    $webform = null;
-
-    $ping = $api->ping();
-
-    if ( isset($ping->code)) {
-      variable_del('getresponse_api_key');
-      unset($form_state['values']['getresponse_api_key']);
-      form_set_error('getresponse_api_key', t("Invalid API key"));
-    }
-    else {
-      variable_set('getresponse_api_key', $apikey);
-
-      if (isset($form_state['values']['getresponse_webformid'])) {
-
-        if (isset($form_state['values']['getresponse_comment_campaign'])) {
-          variable_set('getresponse_comment_campaign', $form_state['values']['getresponse_comment_campaign']);
-        }
-
-        if (isset($form_state['values']['getresponse_register_user'])) {
-          variable_set('getresponse_register_user', $form_state['values']['getresponse_register_user']);
-        }
-
-        if (isset($form_state['values']['getresponse_register_campaign'])) {
-          variable_set('getresponse_register_campaign', $form_state['values']['getresponse_register_campaign']);
-        }
-
-        $webform_id = $form_state['values']['getresponse_webformid'];
-
-        $webform = $api->getForm($webform_id);
-
-        if (!isset($webform->formId)) {
-            $webform = $api->getWebform($webform_id);
-        }
-      }
-
-      if ($webform && !empty($webform->scriptUrl)) {
-        variable_set('getresponse_webformurl', $webform->scriptUrl);
-      }
-      else {
-        variable_del('getresponse_webformurl');
-      }
-    }
-  }
-}
-
-/**
- * Implements hook_block_info().
- */
-function getresponse_block_info() {
-  $blocks = array();
-  $blocks['webform'] = array(
-    'info' => t("GetResponse WebForm"),
-    'status' => TRUE,
-    'region' => 'sidebar_first',
-    'cache' => DRUPAL_NO_CACHE,
-  );
-  return $blocks;
-}
-
-/**
- * Implements hook_block_view().
- */
-function getresponse_block_view($delta = '') {
-  $block = array();
-  $block['content'] = '<noscript>' . t("Please enable JavaScript to use the GetResponse service.") . '</noscript>';
-  $webform_url = variable_get('getresponse_webformurl', '');
-  $block['content'] .= '<script type="text/javascript" src="' . $webform_url . '"></script>';
-  return $block;
-}
-
-/**
- * Implements hook_form_comment_form_alter().
+ * @param array $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param string $form_id
  */
 function getresponse_form_comment_form_alter(&$form, &$form_state, $form_id) {
-  $webform_url = variable_get('getresponse_webformurl', '');
-  $comment_on = variable_get('getresponse_comment_on', '0');
-  $can_enter_email = FALSE;
-  if (variable_get('comment_anonymous_' . str_replace('comment_node_', '', $form_state['comment']->node_type), COMMENT_ANONYMOUS_MAYNOT_CONTACT) == COMMENT_ANONYMOUS_MUST_CONTACT) {
-    $can_enter_email = TRUE;
-  }
-  if (!user_is_logged_in() && $comment_on && !empty($webform_url) && $can_enter_email) {
-    $form['getresponse_comment_checkbox'] = array(
-      '#type' => 'checkbox',
-      '#title' => variable_get('getresponse_comment_label', t("Sign up to our newsletter!")),
-      '#default_value' => 0,
-    );
+  if (\Drupal::currentUser()->isAnonymous() && \Drupal::config('getresponse.settings')->get('comment_on') == 1) {
+    $text = \Drupal::config('getresponse.settings')->get('comment_label');
+    $form['getresponse_comment_checkbox'] = array('#type' => 'checkbox', '#title' => $text);
+    $form['mail'] = array('#type' => 'textfield', '#title' => 'E-mail');
+
+    $input = $form_state->getUserInput();
+
+    if (!empty($input) && isset($input['getresponse_comment_checkbox'])) {
+      if (!empty($input['mail']) && $input['getresponse_comment_checkbox'] == 1) {
+        $api_key = \Drupal::config('getresponse.settings')->get('api_key');
+        $api = new Drupal\getresponse\Service\Api($api_key);
+        $api->addContact(array(
+          'name' => $input['name'],
+          'email' => $input['mail'],
+          'campaign' => array(
+            'campaignId' => \Drupal::config('getresponse.settings')->get('comment_campaign')
+          )
+        ));
+      }
+    }
   }
 }
 
 /**
- * Implements hook_comment_insert().
+ * @param array $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param string $form_id
  */
-function getresponse_comment_insert($comment) {
-  if (!user_is_logged_in()) {
-    $api_key = variable_get('getresponse_api_key', '');
-    $campaign_id = variable_get('getresponse_comment_campaign', '');
-    $comment_on = variable_get('getresponse_comment_on', '0');
-    if ($api_key && $campaign_id && $comment_on && !empty($comment->mail) && isset($comment->getresponse_comment_checkbox)) {
-      require_once('getresponse-api.class.php');
-      $api = new GetResponse($api_key);
+function getresponse_form_user_register_form_alter(&$form, &$form_state, $form_id) {
+  if (\Drupal::config('getresponse.settings')->get('register_user') == 1) {
+    $text = \Drupal::config('getresponse.settings')->get('register_label');
+    $form['getresponse_register_checkbox'] = array('#type' => 'checkbox', '#title' => $text);
 
+    $input = $form_state->getUserInput();
+
+    if (!empty($input) && isset($input['getresponse_register_checkbox']) && $input['getresponse_register_checkbox'] == 1) {
+      $api_key = \Drupal::config('getresponse.settings')->get('api_key');
+      $api = new Drupal\getresponse\Service\Api($api_key);
       $api->addContact(array(
-        'name' => $comment->name,
-        'email' => $comment->mail,
+        'name' => $input['name'],
+        'email' => $input['mail'],
         'campaign' => array(
-          'campaignId' => $campaign_id
+          'campaignId' => \Drupal::config('getresponse.settings')->get('comment_campaign')
         )
       ));
     }
-  }
-}
-
-
-/**
- * Implements hook_form_FORM_ID_alter().
- */
-function getresponse_form_user_register_form_alter(&$form, &$form_state) {
-
-  $api_key = variable_get('getresponse_api_key', '');
-  $campaign_id = variable_get('getresponse_register_campaign', '');
-
-  if (!empty($form_state['input']['mail']) && !empty($api_key) && isset($form_state['input']['getresponse_comment_checkbox']) && $form_state['input']['getresponse_comment_checkbox'] == '1') {
-
-    require_once('getresponse-api.class.php');
-    $api = new GetResponse($api_key);
-
-    $api->addContact(array(
-      'name' => $form_state['input']['name'],
-      'email' => $form_state['input']['mail'],
-      'campaign' => array(
-        'campaignId' => $campaign_id
-      )
-    ));
-
-  }
-
-  $register_on = variable_get('getresponse_register_user', '0');
-
-  $can_register = FALSE;
-  if (variable_get('user_register', USER_REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL)) {
-    $can_register = TRUE;
-  }
-
-  if (!user_is_logged_in() && $register_on && !empty($api_key) && $can_register) {
-    $form['getresponse_comment_checkbox'] = array(
-      '#type' => 'checkbox',
-      '#title' => variable_get('getresponse_register_label', t("Sign up to our newsletter!")),
-      '#default_value' => 0,
-    );
   }
 }
