@@ -11,7 +11,8 @@ window.onload = function () {
   }
 
   if (document.getElementById('gr-disconnect-btn')) {
-    document.getElementById('gr-disconnect-btn').onclick = function () {
+    document.getElementById('gr-disconnect-btn').onclick = function (event) {
+      event.preventDefault();
       document.getElementById('gr-disconnect-modal').classList.toggle('hidden');
       return false;
     };
