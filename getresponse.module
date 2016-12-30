@@ -459,45 +459,6 @@ function getresponse_admin_validate($form, &$form_state) {
 
       if (isset($form_state['values']['getresponse_webformid'])) {
 
-        if (isset($form_state['values']['getresponse_comment_campaign'])) {
-          variable_set('getresponse_comment_campaign', $form_state['values']['getresponse_comment_campaign']);
-        }
-
-        if (isset($form_state['values']['getresponse_register_user'])) {
-          variable_set('getresponse_register_user',
-              $form_state['values']['getresponse_register_user']);
-        }
-
-        if (isset($form_state['values']['getresponse_register_campaign'])) {
-          variable_set('getresponse_register_campaign',
-              $form_state['values']['getresponse_register_campaign']);
-        }
-
-        if (isset($form_state['values']['getresponse_register_label'])) {
-          variable_set('getresponse_register_label',
-              $form_state['values']['getresponse_register_label']);
-        }
-
-        if (isset($form_state['values']['getresponse_comment_label'])) {
-          variable_set('getresponse_comment_label',
-              $form_state['values']['getresponse_comment_label']);
-        }
-
-        if (isset($form_state['values']['getresponse_comment_on'])) {
-          variable_set('getresponse_comment_on',
-              $form_state['values']['getresponse_comment_on']);
-        }
-
-        if (isset($form_state['values']['getresponse_webform_on'])) {
-          variable_set('getresponse_webform_on',
-              $form_state['values']['getresponse_webform_on']);
-        }
-
-        if (isset($form_state['values']['getresponse_webformid'])) {
-          variable_set('getresponse_webformid',
-              $form_state['values']['getresponse_webformid']);
-        }
-
         $webform_id = $form_state['values']['getresponse_webformid'];
 
         $webform = $api->getForm($webform_id);
@@ -506,6 +467,46 @@ function getresponse_admin_validate($form, &$form_state) {
             $webform = $api->getWebform($webform_id);
         }
       }
+
+
+        if (isset($form_state['values']['getresponse_comment_campaign'])) {
+            variable_set('getresponse_comment_campaign', $form_state['values']['getresponse_comment_campaign']);
+        }
+
+        if (isset($form_state['values']['getresponse_register_user'])) {
+            variable_set('getresponse_register_user',
+                $form_state['values']['getresponse_register_user']);
+        }
+
+        if (isset($form_state['values']['getresponse_register_campaign'])) {
+            variable_set('getresponse_register_campaign',
+                $form_state['values']['getresponse_register_campaign']);
+        }
+
+        if (isset($form_state['values']['getresponse_register_label'])) {
+            variable_set('getresponse_register_label',
+                $form_state['values']['getresponse_register_label']);
+        }
+
+        if (isset($form_state['values']['getresponse_comment_label'])) {
+            variable_set('getresponse_comment_label',
+                $form_state['values']['getresponse_comment_label']);
+        }
+
+        if (isset($form_state['values']['getresponse_comment_on'])) {
+            variable_set('getresponse_comment_on',
+                $form_state['values']['getresponse_comment_on']);
+        }
+
+        if (isset($form_state['values']['getresponse_webform_on'])) {
+            variable_set('getresponse_webform_on',
+                $form_state['values']['getresponse_webform_on']);
+        }
+
+        if (isset($form_state['values']['getresponse_webformid'])) {
+            variable_set('getresponse_webformid',
+                $form_state['values']['getresponse_webformid']);
+        }
 
       if ($webform && !empty($webform->scriptUrl)) {
         variable_set('getresponse_webformurl', $webform->scriptUrl);
