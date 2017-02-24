@@ -586,9 +586,11 @@ function getresponse_comment_insert($comment) {
       $api->addContact(array(
         'name' => $comment->name,
         'email' => $comment->mail,
-        'campaign' => array(
-          'campaignId' => $campaign_id
-        )
+        'campaign' => array('campaignId' => $campaign_id),
+          'customFieldValues' => array(array(
+            'customFieldId' => getresponse_get_origin_custom_id($api_key),
+            'value' => array('drupal')
+          ))
       ));
     }
   }
@@ -615,7 +617,11 @@ function getresponse_form_user_register_form_alter(&$form, &$form_state) {
         $api->addContact(array(
           'name' => $form_state['input']['name'],
           'email' => $form_state['input']['mail'],
-          'campaign' => array('campaignId' => $campaign_id)
+          'campaign' => array('campaignId' => $campaign_id),
+          'customFieldValues' => array(array(
+            'customFieldId' => getresponse_get_origin_custom_id($api_key),
+            'value' => array('drupal')
+          ))
         ));
       }
     }
@@ -629,4 +635,29 @@ function getresponse_form_user_register_form_alter(&$form, &$form_state) {
       );
     }
   }
+}
+
+/**
+ * @param string $api_key
+ * @return string
+ */
+function getresponse_get_origin_custom_id($api_key)
+{
+  $api = new GetResponse($api_key);
+  $customs = $api->getCustomFields(array('fields' => 'name'));
+
+  foreach ($customs as $custom) {
+    if ($custom->name === 'origin') {
+      return $custom->customFieldId;
+    }
+  }
+
+  $custom = $api->setCustomField(array(
+    'name' => 'origin',
+    'hidden' => FALSE,
+    'type' => 'text',
+    'value' => array('drupal')
+  ));
+
+  return $custom->customFieldId;
 }
