@@ -37,11 +37,42 @@ function getresponse_form_comment_form_alter(&$form, &$form_state, $form_id) {
           'email' => $input['mail'],
           'campaign' => array(
             'campaignId' => \Drupal::config('getresponse.settings')->get('comment_campaign')
+          ),
+          'customFieldValues' => array(
+            array(
+              'customFieldId' => getresponse_get_origin_custom_id($api_key),
+              'value' => array('drupal')
+            )
           )
         ));
       }
     }
   }
+}
+
+/**
+ * @param string $api_key
+ * @return string
+ */
+function getresponse_get_origin_custom_id($api_key)
+{
+  $api = new Drupal\getresponse\Service\Api($api_key);
+  $customs = $api->getCustomFields(array('fields' => 'name'));
+
+  foreach ($customs as $custom) {
+    if ($custom->name === 'origin') {
+      return $custom->customFieldId;
+    }
+  }
+
+  $custom = $api->setCustomField(array(
+    'name' => 'origin',
+    'hidden' => FALSE,
+    'type' => 'text',
+    'value' => array('drupal')
+  ));
+
+  return $custom->customFieldId;
 }
 
 /**
@@ -64,6 +95,12 @@ function getresponse_form_user_register_form_alter(&$form, &$form_state, $form_i
         'email' => $input['mail'],
         'campaign' => array(
           'campaignId' => \Drupal::config('getresponse.settings')->get('comment_campaign')
+        ),
+        'customFieldValues' => array(
+          array(
+            'customFieldId' => getresponse_get_origin_custom_id($api_key),
+            'value' => array('drupal')
+          )
         )
       ));
     }
