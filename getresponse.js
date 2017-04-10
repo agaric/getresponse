@@ -42,36 +42,38 @@ window.onload = function () {
     };
   }
 
-  document.getElementById('edit-getresponse-api-key').onchange = function () {
-    if (this.value == '') {
-      if (document.getElementById('gr-connect')) {
-        document.getElementById('gr-connect').classList.add('gr-btn-disable');
-      }
-      if (document.getElementById('edit-submit')) {
-        document.getElementById('edit-submit').classList.add('gr-btn-disable');
-      }
+  if (document.getElementById('edit-getresponse-api-key') != null) {
+    document.getElementById('edit-getresponse-api-key').onchange = function () {
+      if (this.value == '') {
+        if (document.getElementById('gr-connect')) {
+          document.getElementById('gr-connect').classList.add('gr-btn-disable');
+        }
+        if (document.getElementById('edit-submit')) {
+          document.getElementById('edit-submit').classList.add('gr-btn-disable');
+        }
 
-      var buttons = document.getElementsByClassName('gr-btn-disable');
-      for (var x = 0, length = buttons.length; x < length; x++) {
-        buttons[x].onclick = function() {
-          if (this.className.match(/\bgr-btn-disable\b/)) {
-            return false;
+        var buttons = document.getElementsByClassName('gr-btn-disable');
+        for (var x = 0, length = buttons.length; x < length; x++) {
+          buttons[x].onclick = function () {
+            if (this.className.match(/\bgr-btn-disable\b/)) {
+              return false;
+            }
           }
         }
+      } else {
+        if (document.getElementById('gr-connect')) {
+          document.getElementById('gr-connect').classList.remove('gr-btn-disable');
+        }
+        if (document.getElementById('edit-submit')) {
+          document.getElementById('edit-submit').classList.remove('gr-btn-disable');
+        }
       }
-    } else {
-      if (document.getElementById('gr-connect')) {
-        document.getElementById('gr-connect').classList.remove('gr-btn-disable');
-      }
-      if (document.getElementById('edit-submit')) {
-        document.getElementById('edit-submit').classList.remove('gr-btn-disable');
-      }
-    }
-  };
+    };
 
-  document.getElementById('edit-getresponse-api-key').onkeyup = function () {
-    document.getElementById('edit-getresponse-api-key').onchange();
-  };
+    document.getElementById('edit-getresponse-api-key').onkeyup = function () {
+      document.getElementById('edit-getresponse-api-key').onchange();
+    };
+  }
 
   document.getElementById('edit-getresponse-api-key').onchange();
 
