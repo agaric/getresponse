@@ -43,7 +43,7 @@ window.onload = function () {
 
     function checkEditApiKey(button) {
 
-        if (button.value == '') {
+        if (button.value === '') {
             if (document.getElementById('gr-connect')) {
                 document.getElementById('gr-connect').classList.add('gr-btn-disable');
             }
@@ -67,7 +67,25 @@ window.onload = function () {
         checkEditApiKey(this);
     };
 
-    if (document.getElementById('edit-api-key').value != '' && document.getElementById('edit-api-key').className !== 'form-text error') {
+    if (document.getElementById('edit-api-key').value !== '' && document.getElementById('edit-api-key').className !== 'form-text error') {
         document.getElementById('edit-submit').className = 'button button--primary js-form-submit form-submit gr-btn-display';
     }
+
+    document.getElementById('is-enterprise').onclick = function() {
+        enableEnterpriseFormInputs(this);
+    }
+
+    function enableEnterpriseFormInputs(checkbox) {
+        var i;
+        var inputs = document.getElementsByClassName('enterprise-type');
+
+        for (i = 0; i < inputs.length; i++) {
+            if (checkbox.checked) {
+                inputs[i].style.display = "block";
+            } else {
+                inputs[i].style.display = "none";
+            }
+        }
+    }
+    enableEnterpriseFormInputs(document.getElementById('is-enterprise'));
 };

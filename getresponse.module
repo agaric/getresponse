@@ -18,9 +18,8 @@ function getresponse_menu() {
 /**
  * @param array $form
  * @param \Drupal\Core\Form\FormStateInterface $form_state
- * @param string $form_id
  */
-function getresponse_form_comment_form_alter(&$form, &$form_state, $form_id) {
+function getresponse_form_comment_form_alter(&$form, &$form_state) {
   if (\Drupal::currentUser()->isAnonymous() && \Drupal::config('getresponse.settings')->get('comment_on') == 1) {
     $text = \Drupal::config('getresponse.settings')->get('comment_label');
     $form['getresponse_comment_checkbox'] = array('#type' => 'checkbox', '#title' => $text);
@@ -31,7 +30,9 @@ function getresponse_form_comment_form_alter(&$form, &$form_state, $form_id) {
     if (!empty($input) && isset($input['getresponse_comment_checkbox'])) {
       if (!empty($input['mail']) && $input['getresponse_comment_checkbox'] == 1) {
         $api_key = \Drupal::config('getresponse.settings')->get('api_key');
-        $api = new Drupal\getresponse\Service\Api($api_key);
+        $domain = \Drupal::config('getresponse.settings')->get('domain');
+        $api_url = \Drupal::config('getresponse.settings')->get('api_url');
+        $api = new Drupal\getresponse\Service\Api($api_key, $api_url, $domain);
         $api->addContact(array(
           'name' => $input['name'],
           'email' => $input['mail'],
@@ -40,7 +41,7 @@ function getresponse_form_comment_form_alter(&$form, &$form_state, $form_id) {
           ),
           'customFieldValues' => array(
             array(
-              'customFieldId' => getresponse_get_origin_custom_id($api_key),
+              'customFieldId' => getresponse_get_origin_custom_id($api_key, $api_url, $domain),
               'value' => array('drupal')
             )
           )
@@ -52,25 +53,25 @@ function getresponse_form_comment_form_alter(&$form, &$form_state, $form_id) {
 
 /**
  * @param string $api_key
+ * @param string $api_url
+ * @param string $domain
+ *
  * @return string
  */
-function getresponse_get_origin_custom_id($api_key)
+function getresponse_get_origin_custom_id($api_key, $api_url, $domain)
 {
-  $api = new Drupal\getresponse\Service\Api($api_key);
-  $customs = $api->getCustomFields(array('fields' => 'name'));
+  $api = new Drupal\getresponse\Service\Api($api_key, $api_url, $domain);
 
-  foreach ($customs as $custom) {
-    if ($custom->name === 'origin') {
-      return $custom->customFieldId;
-    }
+  $custom = end($api->getCustomFields(['fields' => 'name', 'query[name]'=> 'origin']));
+
+  if (!isset($custom->customFieldId)) {
+    $custom = $api->setCustomField(array(
+      'name' => 'origin',
+      'hidden' => FALSE,
+      'type' => 'text',
+      'value' => array('drupal')
+    ));
   }
-
-  $custom = $api->setCustomField(array(
-    'name' => 'origin',
-    'hidden' => FALSE,
-    'type' => 'text',
-    'value' => array('drupal')
-  ));
 
   return $custom->customFieldId;
 }
@@ -78,9 +79,8 @@ function getresponse_get_origin_custom_id($api_key)
 /**
  * @param array $form
  * @param \Drupal\Core\Form\FormStateInterface $form_state
- * @param string $form_id
  */
-function getresponse_form_user_register_form_alter(&$form, &$form_state, $form_id) {
+function getresponse_form_user_register_form_alter(&$form, &$form_state) {
   if (\Drupal::config('getresponse.settings')->get('register_user') == 1) {
     $text = \Drupal::config('getresponse.settings')->get('register_label');
     $form['getresponse_register_checkbox'] = array('#type' => 'checkbox', '#title' => $text);
@@ -89,16 +89,19 @@ function getresponse_form_user_register_form_alter(&$form, &$form_state, $form_i
 
     if (!empty($input) && isset($input['getresponse_register_checkbox']) && $input['getresponse_register_checkbox'] == 1) {
       $api_key = \Drupal::config('getresponse.settings')->get('api_key');
-      $api = new Drupal\getresponse\Service\Api($api_key);
+      $api_url = \Drupal::config('getresponse.settings')->get('api_url');
+      $domain = \Drupal::config('getresponse.settings')->get('domain');
+
+      $api = new Drupal\getresponse\Service\Api($api_key, $api_url, $domain);
       $api->addContact(array(
         'name' => $input['name'],
         'email' => $input['mail'],
         'campaign' => array(
-          'campaignId' => \Drupal::config('getresponse.settings')->get('comment_campaign')
+          'campaignId' => \Drupal::config('getresponse.settings')->get('register_campaign')
         ),
         'customFieldValues' => array(
           array(
-            'customFieldId' => getresponse_get_origin_custom_id($api_key),
+            'customFieldId' => getresponse_get_origin_custom_id($api_key, $api_url, $domain),
             'value' => array('drupal')
           )
         )

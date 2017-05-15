@@ -1,10 +1,8 @@
 <?php
-
 /**
  * @file
  * Contains \Drupal\getresponse\Form\GetresponseConfigForm.
  */
-
 namespace Drupal\getresponse\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
@@ -14,7 +12,15 @@ use Drupal\getresponse\Service\Api;
 use Drupal\getresponse\Service\Rss;
 use Drupal\Core\Url;
 
+/**
+ * Class GetresponseConfigForm
+ * @package Drupal\getresponse\Form
+ */
 class GetresponseConfigForm extends ConfigFormBase {
+
+  const API_URL_360_COM = 'https://api3.getresponse360.com/v3';
+  const API_URL_360_PL = 'https://api3.getresponse360.pl/v3';
+  const API_URL_SMB = 'https://api.getresponse.com/v3';
 
   /**
    * {@inheritdoc}
@@ -35,6 +41,7 @@ class GetresponseConfigForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('getresponse.settings');
+    $api = new Api($config->get('api_key'), $config->get('api_url'), $config->get('domain'));
 
     $form['#attached']['library'][] = 'getresponse/getresponse.settings.form';
 
@@ -55,7 +62,6 @@ class GetresponseConfigForm extends ConfigFormBase {
     );
 
     if ($config->get('api_key')) {
-      $api = new Api($config->get('api_key'));
       $account = $api->accounts();
 
       $form['left']['account']['info'] = array(
@@ -95,8 +101,38 @@ class GetresponseConfigForm extends ConfigFormBase {
       '#default_value' => $config->get('api_key'),
       '#size' => 32,
       '#minlength' => 12,
-      '#description' => $api_button
+      '#description' => $api_button,
     );
+
+    if (NULL === $config->get('api_key')) {
+
+      $form['left']['account']['is_enterprise'] = array(
+        '#type' => 'checkbox',
+        '#title' => $this->t('GetResponse 360'),
+        '#size' => 32,
+        '#attributes' => array('id' => array('is-enterprise'))
+      );
+
+      $form['left']['account']['api_url'] = array(
+        '#type' => 'select',
+        '#title' => $this->t('Type'),
+        '#options' => array(
+          self::API_URL_360_PL => $this->t('GetResponse 360 PL'),
+          self::API_URL_360_COM => $this->t('GetResponse 360 COM')
+        ),
+        '#prefix' => '<div class="enterprise-type">',
+        '#suffix' => '</div>'
+      );
+
+      $form['left']['account']['domain'] = array(
+        '#type' => 'textfield',
+        '#title' => $this->t('Domain'),
+        '#size' => 32,
+        '#minlength' => 12,
+        '#prefix' => '<div class="enterprise-type" style="display: none">',
+        '#suffix' => '</div>',
+      );
+    }
 
     $form['left']['account']['api_key_info'] = array(
       '#type' => 'item',
@@ -370,13 +406,32 @@ class GetresponseConfigForm extends ConfigFormBase {
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $api_key = $this->config('getresponse.settings')->get('api_key');
     $input = $form_state->getUserInput();
+    $api_url = $input['api_url'];
+    $domain = $input['domain'];
 
-    if (empty($input['api_key'])) {
+    $isEnterprise = (bool) $input['is_enterprise'];
+
+    if ($isEnterprise) {
+
+      if (!in_array($api_url, array(self::API_URL_360_PL, self::API_URL_360_COM))) {
+        $form_state->setErrorByName('api_url', $this->t('Invalid type.'));
+      }
+
+      if (empty($domain)) {
+        $form_state->setErrorByName('domain', $this->t('Invalid domain.'));
+      }
+
+    } else {
+      $api_url = self::API_URL_SMB;
+      $domain = null;
+    }
+
+    if (empty($input['api_key']) && empty($api_key)) {
       $form_state->setErrorByName('api_key', $this->t('Empty api key.'));
     }
 
-    if ($api_key != $input['api_key']) {
-      $api = new Api($input['api_key']);
+    if (empty($api_key) && $api_key != $input['api_key']) {
+      $api = new Api($input['api_key'], $api_url, $domain);
       $ping = $api->ping();
 
       if (isset($ping->code)) {
@@ -392,11 +447,19 @@ class GetresponseConfigForm extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
 
     $config = $this->config('getresponse.settings');
+    $current_api_key = $config->get('api_key');
 
-    $actual_form = $this->config('getresponse.settings')->get('script_url');
-    $this->config('getresponse.settings')
-        ->set('api_key', $form_state->getValue('api_key'))
-        ->set('webform_on', $form_state->getValue('webform_on'))
+    // update credentials only, if api key not exists in database.
+    if (empty($current_api_key)) {
+      $config->set('api_key', $form_state->getValue('api_key'));
+
+      if ((bool) $form_state->getValue('is_enterprise')) {
+        $config->set('domain', $form_state->getValue('domain'));
+        $config->set('api_url', $form_state->getValue('api_url'));
+      }
+    }
+
+    $config->set('webform_on', $form_state->getValue('webform_on'))
         ->set('script_url', $form_state->getValue('script_url'))
         ->set('comment_on', $form_state->getValue('comment_on'))
         ->set('comment_label', $form_state->getValue('comment_label'))
@@ -406,6 +469,8 @@ class GetresponseConfigForm extends ConfigFormBase {
         ->set('register_campaign', $form_state->getValue('register_campaign'))
         ->save();
 
+    $actual_form = $config->get('script_url');
+
     if ($actual_form != $form_state->getValue('script_url')) {
       drupal_flush_all_caches();
     }
@@ -413,8 +478,7 @@ class GetresponseConfigForm extends ConfigFormBase {
     unset($_SESSION['messages']);
     if ($config->get('api_key')) {
       drupal_set_message($this->t('Subscription settings successfully saved.'));
-    }
-    else {
+    } else {
       drupal_set_message($this->t('You connected your Drupal to GetResponse.'));
     }
   }

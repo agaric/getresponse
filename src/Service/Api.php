@@ -13,16 +13,18 @@ namespace Drupal\getresponse\Service;
  */
 class Api {
 
+  private $invalid_response_codes = array(301);
+
   private $api_key;
   private $api_url = 'https://api.getresponse.com/v3';
+
   private $timeout = 8;
   public $http_status;
 
   /**
-   * X-Domain header value if empty header will be not provided
-   * @var string|null
+   * @var string
    */
-  private $enterprise_domain = NULL;
+  private $domain;
 
   /**
    * X-APP-ID header value if empty header will be not provided
@@ -32,14 +34,20 @@ class Api {
 
   /**
    * Set api key and optionally API endpoint
-   * @param      $api_key
-   * @param null $api_url
+   *
+   * @param string $api_key
+   * @param string $api_url
+   * @param string $domain
    */
-  public function __construct($api_key, $api_url = NULL) {
+  public function __construct($api_key, $api_url = NULL, $domain = NULL) {
     $this->api_key = $api_key;
 
     if (!empty($api_url)) {
       $this->api_url = $api_url;
+    }
+
+    if (!empty($domain)) {
+      $this->domain = $domain;
     }
   }
 
@@ -99,7 +107,7 @@ class Api {
    * @return mixed
    */
   public function getRSSNewsletters() {
-    $this->call('rss-newsletters', 'GET', NULL);
+    return $this->call('rss-newsletters', 'GET', NULL);
   }
 
   /**
@@ -340,8 +348,8 @@ class Api {
       )
     );
 
-    if (!empty($this->enterprise_domain)) {
-      $options[CURLOPT_HTTPHEADER][] = 'X-Domain: ' . $this->enterprise_domain;
+    if (!empty($this->domain)) {
+      $options[CURLOPT_HTTPHEADER][] = 'X-Domain: ' . $this->domain;
     }
 
     if (!empty($this->app_id)) {
@@ -351,11 +359,8 @@ class Api {
     if ($http_method == 'POST') {
       $options[CURLOPT_POST] = 1;
       $options[CURLOPT_POSTFIELDS] = $params;
-    }
-    else {
-      if ($http_method == 'DELETE') {
-        $options[CURLOPT_CUSTOMREQUEST] = 'DELETE';
-      }
+    } else if ($http_method == 'DELETE') {
+      $options[CURLOPT_CUSTOMREQUEST] = 'DELETE';
     }
 
     $curl = curl_init();
@@ -364,6 +369,16 @@ class Api {
     $response = json_decode(curl_exec($curl));
 
     $this->http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+    // jeżeli wystąpi jeden z nieprawidłowych kodów (np. 301 - przekierowanie) należy zwrócić to jako błąd.
+    if (in_array($this->http_status, $this->invalid_response_codes)) {
+      return (object) array(
+        'httpStatus' => '301',
+        'code' => '301',
+        'codeDescription' => 'Error in external resources',
+        'message' => 'Invalid response'
+      );
+    }
 
     curl_close($curl);
     return (object) $response;
@@ -383,5 +398,4 @@ class Api {
     }
     return http_build_query($result);
   }
-
 }

@@ -237,3 +237,7 @@
 #getresponse-settings fieldset:not(.fieldgroup) > legend {
     text-transform: none !important;
 }
+
+div.enterprise-type {
+    display: none;
+}
