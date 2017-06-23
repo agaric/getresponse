@@ -3,52 +3,76 @@
 /**
  * Implements hook_menu().
  */
-function getresponse_menu() {
-  $items['getresponse'] = array(
-    'title' => 'GetResponse',
-    'route_name' => 'getresponse.settings_form',
-  );
-  $items['getresponse/config'] = array(
-    'title' => 'Getresponse Configuration',
-    'route_name' => 'getresponse.settings_form',
-  );
-  return $items;
+function getresponse_menu()
+{
+    $items['getresponse']        = [
+        'title'      => 'GetResponse',
+        'route_name' => 'getresponse.settings_form',
+    ];
+    $items['getresponse/config'] = [
+        'title'      => 'Getresponse Configuration',
+        'route_name' => 'getresponse.settings_form',
+    ];
+
+    return $items;
 }
 
 /**
  * @param array $form
  * @param \Drupal\Core\Form\FormStateInterface $form_state
  */
-function getresponse_form_comment_form_alter(&$form, &$form_state) {
-  if (\Drupal::currentUser()->isAnonymous() && \Drupal::config('getresponse.settings')->get('comment_on') == 1) {
-    $text = \Drupal::config('getresponse.settings')->get('comment_label');
-    $form['getresponse_comment_checkbox'] = array('#type' => 'checkbox', '#title' => $text);
-    $form['mail'] = array('#type' => 'textfield', '#title' => 'E-mail');
+function getresponse_form_comment_form_alter(&$form, &$form_state)
+{
+    if (\Drupal::config('getresponse.settings')->get('comment_on') == 1) {
 
-    $input = $form_state->getUserInput();
+        if (\Drupal::currentUser()->isAnonymous()) {
+            $form['mail'] = ['#type' => 'textfield', '#title' => 'E-mail'];
+        }
 
-    if (!empty($input) && isset($input['getresponse_comment_checkbox'])) {
-      if (!empty($input['mail']) && $input['getresponse_comment_checkbox'] == 1) {
-        $api_key = \Drupal::config('getresponse.settings')->get('api_key');
-        $domain = \Drupal::config('getresponse.settings')->get('domain');
-        $api_url = \Drupal::config('getresponse.settings')->get('api_url');
-        $api = new Drupal\getresponse\Service\Api($api_key, $api_url, $domain);
-        $api->addContact(array(
-          'name' => $input['name'],
-          'email' => $input['mail'],
-          'campaign' => array(
-            'campaignId' => \Drupal::config('getresponse.settings')->get('comment_campaign')
-          ),
-          'customFieldValues' => array(
-            array(
-              'customFieldId' => getresponse_get_origin_custom_id($api_key, $api_url, $domain),
-              'value' => array('drupal')
-            )
-          )
-        ));
-      }
+        $text                                 = \Drupal::config('getresponse.settings')->get('comment_label');
+        $form['getresponse_comment_checkbox'] = ['#type' => 'checkbox', '#title' => $text];
+
+        $input = $form_state->getUserInput();
+
+        if (!empty($input) && isset($input['getresponse_comment_checkbox']) && $input['getresponse_comment_checkbox'] == 1) {
+            if (!empty($input['mail'])) {
+                $email = $input['mail'];
+                $name = $input['name'];
+            } else if (!\Drupal::currentUser()->isAnonymous()) {
+                $email = \Drupal::currentUser()->getEmail();
+                $name = \Drupal::currentUser()->getDisplayName();
+                $name = (strlen($name) < 3) ? null : $name;
+            }
+
+            if (empty($email)) {
+                return;
+            }
+
+            $api_key = \Drupal::config('getresponse.settings')->get('api_key');
+            $domain  = \Drupal::config('getresponse.settings')->get('domain');
+            $api_url = \Drupal::config('getresponse.settings')->get('api_url');
+            $api     = new Drupal\getresponse\Service\Api($api_key, $api_url, $domain);
+
+            $data = [
+                'email'             => $email,
+                'campaign'          => [
+                    'campaignId' => \Drupal::config('getresponse.settings')->get('comment_campaign')
+                ],
+                'customFieldValues' => [
+                    [
+                        'customFieldId' => getresponse_get_origin_custom_id($api_key, $api_url, $domain),
+                        'value'         => ['drupal']
+                    ]
+                ]
+            ];
+
+            if (!empty($name)) {
+                $data['name'] = $name;
+            }
+
+            $api->addContact($data);
+        }
     }
-  }
 }
 
 /**
@@ -60,52 +84,53 @@ function getresponse_form_comment_form_alter(&$form, &$form_state) {
  */
 function getresponse_get_origin_custom_id($api_key, $api_url, $domain)
 {
-  $api = new Drupal\getresponse\Service\Api($api_key, $api_url, $domain);
+    $api = new Drupal\getresponse\Service\Api($api_key, $api_url, $domain);
 
-  $custom = end($api->getCustomFields(['fields' => 'name', 'query[name]'=> 'origin']));
+    $custom = end($api->getCustomFields(['fields' => 'name', 'query[name]' => 'origin']));
 
-  if (!isset($custom->customFieldId)) {
-    $custom = $api->setCustomField(array(
-      'name' => 'origin',
-      'hidden' => FALSE,
-      'type' => 'text',
-      'value' => array('drupal')
-    ));
-  }
+    if (!isset($custom->customFieldId)) {
+        $custom = $api->setCustomField([
+            'name'   => 'origin',
+            'hidden' => false,
+            'type'   => 'text',
+            'value'  => ['drupal']
+        ]);
+    }
 
-  return $custom->customFieldId;
+    return $custom->customFieldId;
 }
 
 /**
  * @param array $form
  * @param \Drupal\Core\Form\FormStateInterface $form_state
  */
-function getresponse_form_user_register_form_alter(&$form, &$form_state) {
-  if (\Drupal::config('getresponse.settings')->get('register_user') == 1) {
-    $text = \Drupal::config('getresponse.settings')->get('register_label');
-    $form['getresponse_register_checkbox'] = array('#type' => 'checkbox', '#title' => $text);
+function getresponse_form_user_register_form_alter(&$form, &$form_state)
+{
+    if (\Drupal::config('getresponse.settings')->get('register_user') == 1) {
+        $text                                  = \Drupal::config('getresponse.settings')->get('register_label');
+        $form['getresponse_register_checkbox'] = ['#type' => 'checkbox', '#title' => $text];
 
-    $input = $form_state->getUserInput();
+        $input = $form_state->getUserInput();
 
-    if (!empty($input) && isset($input['getresponse_register_checkbox']) && $input['getresponse_register_checkbox'] == 1) {
-      $api_key = \Drupal::config('getresponse.settings')->get('api_key');
-      $api_url = \Drupal::config('getresponse.settings')->get('api_url');
-      $domain = \Drupal::config('getresponse.settings')->get('domain');
+        if (!empty($input) && isset($input['getresponse_register_checkbox']) && $input['getresponse_register_checkbox'] == 1) {
+            $api_key = \Drupal::config('getresponse.settings')->get('api_key');
+            $api_url = \Drupal::config('getresponse.settings')->get('api_url');
+            $domain  = \Drupal::config('getresponse.settings')->get('domain');
 
-      $api = new Drupal\getresponse\Service\Api($api_key, $api_url, $domain);
-      $api->addContact(array(
-        'name' => $input['name'],
-        'email' => $input['mail'],
-        'campaign' => array(
-          'campaignId' => \Drupal::config('getresponse.settings')->get('register_campaign')
-        ),
-        'customFieldValues' => array(
-          array(
-            'customFieldId' => getresponse_get_origin_custom_id($api_key, $api_url, $domain),
-            'value' => array('drupal')
-          )
-        )
-      ));
+            $api = new Drupal\getresponse\Service\Api($api_key, $api_url, $domain);
+            $api->addContact([
+                'name'              => $input['name'],
+                'email'             => $input['mail'],
+                'campaign'          => [
+                    'campaignId' => \Drupal::config('getresponse.settings')->get('register_campaign')
+                ],
+                'customFieldValues' => [
+                    [
+                        'customFieldId' => getresponse_get_origin_custom_id($api_key, $api_url, $domain),
+                        'value'         => ['drupal']
+                    ]
+                ]
+            ]);
+        }
     }
-  }
 }
