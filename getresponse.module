@@ -1,5 +1,7 @@
 <?php
 
+use Drupal\getresponse\Service\Api;
+
 /**
  * Implements hook_menu().
  */
@@ -51,7 +53,7 @@ function getresponse_form_comment_form_alter(&$form, &$form_state)
             $api_key = \Drupal::config('getresponse.settings')->get('api_key');
             $domain  = \Drupal::config('getresponse.settings')->get('domain');
             $api_url = \Drupal::config('getresponse.settings')->get('api_url');
-            $api     = new Drupal\getresponse\Service\Api($api_key, $api_url, $domain);
+            $api     = new Api($api_key, $api_url, $domain);
 
             $data = [
                 'email'             => $email,
@@ -84,7 +86,7 @@ function getresponse_form_comment_form_alter(&$form, &$form_state)
  */
 function getresponse_get_origin_custom_id($api_key, $api_url, $domain)
 {
-    $api = new Drupal\getresponse\Service\Api($api_key, $api_url, $domain);
+    $api = new Api($api_key, $api_url, $domain);
 
     $custom = end($api->getCustomFields(['fields' => 'name', 'query[name]' => 'origin']));
 
@@ -117,7 +119,7 @@ function getresponse_form_user_register_form_alter(&$form, &$form_state)
             $api_url = \Drupal::config('getresponse.settings')->get('api_url');
             $domain  = \Drupal::config('getresponse.settings')->get('domain');
 
-            $api = new Drupal\getresponse\Service\Api($api_key, $api_url, $domain);
+            $api = new Api($api_key, $api_url, $domain);
             $api->addContact([
                 'name'              => $input['name'],
                 'email'             => $input['mail'],
