@@ -136,3 +136,81 @@ function getresponse_form_user_register_form_alter(&$form, &$form_state)
         }
     }
 }
+
+/**
+ * Returns all GetResponse lists (campaigns) for a given key. Lists are cached.
+ *
+ * @param array $list_ids
+ *   An array of list IDs to filter the results by.
+ * @param bool $reset
+ *   Force a cache reset.
+ *
+ * @return array
+ *   An array of list data arrays.
+ */
+function getresponse_get_lists($list_ids = array(), $reset = FALSE) {
+  $lists = array();
+  $cache = \Drupal::cache('getresponse');
+  $cached_data = $reset ? NULL : $cache->get('lists');
+
+  // Return cached lists.
+  if ($cached_data) {
+    $lists = $cached_data->data;
+  }
+  else {
+    try {
+      $api_key = \Drupal::config('getresponse.settings')->get('api_key');
+      $api     = new Api($api_key);
+      $result = $api->getCampaigns();
+
+      if ($result->total_items > 0) {
+        foreach ($result->lists as $list) {
+          $lists[$list->id] = $list;
+        }
+      }
+
+      uasort($lists, '_getresponse_list_cmp');
+
+        $cache->set('lists', $lists);
+    }
+    catch (Exception $e) {
+      \Drupal::logger('getresponse')->error('An error occurred requesting list information from GetResponse. "{message}"', array(
+        'message' => $e->getMessage()));
+    }
+  }
+
+  // Filter by given IDs.
+  if (!empty($list_ids)) {
+    $filtered_lists = array();
+
+    foreach ($list_ids as $id) {
+      if (array_key_exists($id, $lists)) {
+        $filtered_lists[$id] = $lists[$id];
+      }
+    }
+
+    return $filtered_lists;
+  }
+  else {
+    return $lists;
+  }
+}
+
+/**
+ * Helper function used by uasort() to sort lists alphabetically by name.
+ *
+ * @param array $a
+ *   An array representing the first list.
+ * @param array $b
+ *   An array representing the second list.
+ *
+ * @return int
+ *   One of the values -1, 0, 1
+ */
+function _getresponse_list_cmp($a, $b) {
+  if ($a->name == $b->name) {
+    return 0;
+  }
+
+  return ($a->name < $b->name) ? -1 : 1;
+}
