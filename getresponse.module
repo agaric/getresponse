@@ -154,24 +154,22 @@ function getresponse_get_lists($list_ids = array(), $reset = FALSE) {
   $cached_data = $reset ? NULL : $cache->get('lists');
 
   // Return cached lists.
-  if ($cached_data) {
+  if ($cached_data && $cached_data->data) {
     $lists = $cached_data->data;
   }
   else {
     try {
       $api_key = \Drupal::config('getresponse.settings')->get('api_key');
-      $api     = new Api($api_key);
+      $api = new Api($api_key);
       $result = $api->getCampaigns();
 
-      if ($result->total_items > 0) {
-        foreach ($result->lists as $list) {
-          $lists[$list->id] = $list;
-        }
+      foreach ($result as $list) {
+        $lists[$list->campaignId] = $list;
       }
 
       uasort($lists, '_getresponse_list_cmp');
 
-        $cache->set('lists', $lists);
+      $cache->set('lists', $lists);
     }
     catch (Exception $e) {
       \Drupal::logger('getresponse')->error('An error occurred requesting list information from GetResponse. "{message}"', array(
