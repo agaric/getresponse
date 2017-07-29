@@ -1,12 +1,12 @@
 getresponse.settings_form:
-  path: 'admin/getresponse/config'
+  path: 'admin/config/services/getresponse'
   defaults:
     _form: '\Drupal\getresponse\Form\GetresponseConfigForm'
   requirements:
     _permission: 'administer site configuration'
 
 getresponse.disconnect:
-  path: 'admin/getresponse/disconnect'
+  path: 'admin/config/services/getresponse/disconnect'
   defaults:
     _controller: '\Drupal\getresponse\Controller\GetresponseController::disconnect'
     _title: 'Disconnect integration'
