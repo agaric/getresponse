@@ -195,6 +195,61 @@ function getresponse_get_lists($list_ids = array(), $reset = FALSE) {
 }
 
 /**
+ * Returns all GetResponse custom fields. Fields are cached.
+ *
+ * @param array $field_ids
+ *   An array of list IDs to filter the results by.
+ * @param bool $reset
+ *   Force a cache reset.
+ *
+ * @return array
+ *   An array of list data arrays.
+ */
+function getresponse_get_custom_fields($field_ids = array(), $reset = FALSE) {
+  $fields = array();
+  $cache = \Drupal::cache('getresponse');
+  $cached_data = $reset ? NULL : $cache->get('custom_fields');
+  if ($cached_data && $cached_data->data) {
+    $fields = $cached_data->data;
+  }
+  else {
+    try {
+      $api_key = \Drupal::config('getresponse.settings')->get('api_key');
+      $api = new Api($api_key);
+      $result = $api->getCustomFields();
+
+      foreach ($result as $field) {
+        $fields[$field->customFieldId] = $field;
+      }
+
+      uasort($fields, '_getresponse_list_cmp');
+
+      $cache->set('custom_fields', $fields);
+    }
+    catch (Exception $e) {
+      \Drupal::logger('getresponse')->error('An error occurred requesting custom fields from GetResponse. "{message}"', array(
+        'message' => $e->getMessage()));
+    }
+  }
+
+  // Filter by given IDs.
+  if (!empty($field_ids)) {
+    $filtered = array();
+
+    foreach ($field_ids as $id) {
+      if (array_key_exists($id, $fields)) {
+        $filtered[$id] = $fields[$id];
+      }
+    }
+
+    return $filtered;
+  }
+  else {
+    return $fields;
+  }
+}
+
+/**
  * Helper function used by uasort() to sort lists alphabetically by name.
  *
  * @param array $a
