@@ -198,12 +198,12 @@ function getresponse_get_lists($list_ids = array(), $reset = FALSE) {
  * Returns all GetResponse custom fields. Fields are cached.
  *
  * @param array $field_ids
- *   An array of list IDs to filter the results by.
+ *   (Optional) An array of field IDs to filter the results by.
  * @param bool $reset
  *   Force a cache reset.
  *
  * @return array
- *   An array of list data arrays.
+ *   An array of custom field data arrays.
  */
 function getresponse_get_custom_fields($field_ids = array(), $reset = FALSE) {
   $fields = array();
